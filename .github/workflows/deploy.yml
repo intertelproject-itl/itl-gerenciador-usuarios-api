@@ -1,0 +1,75 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.x' # Ajuste a versão conforme necessário
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish --configuration Release --output ./publish
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            # Navegar para o diretório da aplicação
+            cd /var/www/itl-gerenciador-usuarios-api || mkdir -p /var/www/itl-gerenciador-usuarios-api && cd /var/www/itl-gerenciador-usuarios-api
+            
+            # Fazer backup da versão anterior
+            if [ -d "publish" ]; then
+              mv publish publish.backup-$(date +%Y%m%d-%H%M%S)
+            fi
+            
+            # Parar o serviço (se estiver rodando)
+            sudo systemctl stop itl-usuarios-api || true
+            
+            # Aguardar a cópia dos arquivos (será feito via SCP no próximo step)
+            sleep 2
+            
+            # Iniciar o serviço
+            sudo systemctl start itl-usuarios-api
+            
+            # Verificar status
+            sudo systemctl status itl-usuarios-api
+
+      - name: Copy published files to VPS
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          source: "publish/"
+          target: "/var/www/itl-gerenciador-usuarios-api/"
+
+      - name: Notify deployment status
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const status = '${{ job.status }}';
+            const emoji = status === 'success' ? '✅' : '❌';
+            console.log(`${emoji} Deploy para VPS: ${status}`);
