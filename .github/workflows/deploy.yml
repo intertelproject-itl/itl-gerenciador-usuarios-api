@@ -8,15 +8,15 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.x' # Ajuste a versão conforme necessário
+          dotnet-version: '10.x'
 
       - name: Restore dependencies
         run: dotnet restore
@@ -25,51 +25,49 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Publish
-        run: dotnet publish --configuration Release --output ./publish
+        run: dotnet publish --configuration Release --output ./publish --no-build
 
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@master
+      - name: Preparar pasta na VPS
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script: |
-            # Navegar para o diretório da aplicação
-            cd /var/www/itl-gerenciador-usuarios-api || mkdir -p /var/www/itl-gerenciador-usuarios-api && cd /var/www/itl-gerenciador-usuarios-api
-            
-            # Fazer backup da versão anterior
-            if [ -d "publish" ]; then
-              mv publish publish.backup-$(date +%Y%m%d-%H%M%S)
+            set -e
+
+            mkdir -p /var/www/itl-gerenciador-usuarios-api
+
+            if systemctl list-units --type=service | grep -q "itl-usuarios-api"; then
+              sudo systemctl stop itl-usuarios-api || true
             fi
-            
-            # Parar o serviço (se estiver rodando)
-            sudo systemctl stop itl-usuarios-api || true
-            
-            # Aguardar a cópia dos arquivos (será feito via SCP no próximo step)
-            sleep 2
-            
-            # Iniciar o serviço
-            sudo systemctl start itl-usuarios-api
-            
-            # Verificar status
-            sudo systemctl status itl-usuarios-api
 
-      - name: Copy published files to VPS
-        uses: appleboy/scp-action@master
+            if [ -d "/var/www/itl-gerenciador-usuarios-api/publish" ]; then
+              mv /var/www/itl-gerenciador-usuarios-api/publish /var/www/itl-gerenciador-usuarios-api/publish.backup-$(date +%Y%m%d-%H%M%S)
+            fi
+
+      - name: Copiar arquivos publicados para VPS
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
-          source: "publish/"
-          target: "/var/www/itl-gerenciador-usuarios-api/"
+          source: "publish/*"
+          target: "/var/www/itl-gerenciador-usuarios-api/publish"
+          strip_components: 1
 
-      - name: Notify deployment status
-        if: always()
-        uses: actions/github-script@v6
+      - name: Iniciar serviço na VPS
+        uses: appleboy/ssh-action@v1.0.3
         with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
           script: |
-            const status = '${{ job.status }}';
-            const emoji = status === 'success' ? '✅' : '❌';
-            console.log(`${emoji} Deploy para VPS: ${status}`);
+            set -e
+
+            sudo systemctl daemon-reload
+            sudo systemctl start itl-usuarios-api
+            sudo systemctl status itl-usuarios-api --no-pager
