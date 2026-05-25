@@ -12,8 +12,6 @@ namespace itl_gerenciador_usuarios_api.Infraestructure.Repositories
             services.AddScoped<ISessaoJogatinaRepository, SessaoJogatinaRepository>();
             services.AddScoped<IPersonagemAtributoRepository, PersonagemAtributoRepository>();
             services.AddScoped<IPersonagemPericiaRepository, PersonagemPericiaRepository>();
-
-            // (manter registros originais)
         }
     }
 }

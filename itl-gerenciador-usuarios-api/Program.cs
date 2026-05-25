@@ -1,5 +1,6 @@
 using itl_gerenciador_usuarios_api.Infraestructure;
 using itl_gerenciador_usuarios_api.Infraestructure.Integration;
+using itl_gerenciador_usuarios_api.Infraestructure.NoSql;
 using itl_gerenciador_usuarios_api.Infraestructure.Repositories;
 using itl_gerenciador_usuarios_api.Services;
 using itl_gerenciador_usuarios_api.Services.v1.Encrypt;
@@ -38,12 +39,11 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddIntegrationModule();
 builder.Services.AddRepositoriesModule();
-builder.Services.AddApplictionModule(builder.Configuration);
-// MongoDB configuration from appsettings
-builder.Services.Configure<itl_gerenciador_usuarios_api.Infraestructure.NoSql.MongoDbSettings>(builder.Configuration.GetSection("ConnectionString"));
-var mongoConn = builder.Configuration.GetSection("ConnectionString")["MongoDB"] ?? "mongodb://localhost:27017/";
+builder.Services.AddApplictionModule();
+
+var mongoConn = builder.Configuration.GetConnectionString("MongoDB");
 builder.Services.AddSingleton<MongoDB.Driver.IMongoClient>(sp => new MongoDB.Driver.MongoClient(mongoConn));
-builder.Services.AddScoped(typeof(itl_gerenciador_usuarios_api.Infraestructure.NoSql.IMongoInventarioRepository<>), typeof(itl_gerenciador_usuarios_api.Infraestructure.NoSql.MongoInventarioRepository<>));
+builder.Services.AddScoped(typeof(IMongoInventarioRepository<>), typeof(MongoInventarioRepository<>));
 
 // Discord integration
 builder.Services.Configure<DiscordSettings>(builder.Configuration.GetSection("Integrations:Discord"));
