@@ -27,4 +27,10 @@ RUN dotnet publish "./itl-gerenciador-usuarios-api.csproj" -c $BUILD_CONFIGURATI
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+RUN mkdir -p /app/wwwroot/uploads \
+    && chown -R app:app /app/wwwroot \
+    && chmod -R 755 /app/wwwroot
+
+USER app
 ENTRYPOINT ["dotnet", "itl-gerenciador-usuarios-api.dll"]
