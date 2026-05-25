@@ -79,6 +79,9 @@ builder.Services.AddSingleton<JwtTokenService>();
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+Console.WriteLine($"ContentRootPath: {app.Environment.ContentRootPath}");
+Console.WriteLine($"WebRootPath: {app.Environment.WebRootPath}");
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -86,6 +89,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseStaticFiles();
 app.UseCors("MinhaPoliticaCors");
 app.UseHttpsRedirection();
 app.UseAuthorization();

@@ -1,14 +1,10 @@
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace itl_gerenciador_usuarios_api.Domain.Models
+namespace itl_gerenciador_usuarios_api.Domain.Dto
 {
-    public class InventarioModel
+    public class InvetarioRequestDto
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string? Id { get; set; }
-
         public int IdPersonagem { get; set; }
         public string Nome { get; set; } = string.Empty;
         public string Descricao { get; set; } = string.Empty;

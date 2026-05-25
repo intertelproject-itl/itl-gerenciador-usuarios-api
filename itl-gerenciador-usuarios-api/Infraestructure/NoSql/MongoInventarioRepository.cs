@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Microsoft.Extensions.Options;
 
 namespace itl_gerenciador_usuarios_api.Infraestructure.NoSql
 {
@@ -7,20 +8,32 @@ namespace itl_gerenciador_usuarios_api.Infraestructure.NoSql
     {
         private readonly IMongoCollection<T> _collection;
 
-        public MongoInventarioRepository(IMongoClient client, string database, string collectionName)
+        public MongoInventarioRepository(IMongoClient client, IOptions<MongoDbSettings> settings)
         {
-            var db = client.GetDatabase(database);
+            var dbName = settings?.Value?.Database ?? "itl_app";
+            var db = client.GetDatabase(dbName);
+            // use the type name as collection name by convention
+            var collectionName = typeof(T).Name.ToLowerInvariant();
             _collection = db.GetCollection<T>(collectionName);
         }
 
         public async Task InsertAsync(T item, CancellationToken ct)
         {
             await _collection.InsertOneAsync(item, cancellationToken: ct);
+
+
         }
 
-        public async Task<T?> GetByIdAsync(string chave, string valor, CancellationToken ct)
+        public async Task<List<T>?> GetByPersoangemIdAsync(string chave, string valor, CancellationToken ct)
         {
-            var filter = Builders<T>.Filter.Eq(chave, valor);
+            var filter = Builders<T>.Filter.Eq(chave, Convert.ToInt32(valor));
+            var res = await _collection.Find(filter).ToListAsync(ct);
+            return res;
+        }
+
+        public async Task<T?> GetBaseByIdAsync(string id, CancellationToken ct)
+        {
+            var filter = Builders<T>.Filter.Eq("_id", new ObjectId(id));
             var res = await _collection.Find(filter).FirstOrDefaultAsync(ct);
             return res;
         }

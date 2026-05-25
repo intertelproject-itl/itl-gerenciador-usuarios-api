@@ -1,5 +1,4 @@
 ﻿using itl_gerenciador_usuarios_api.Domain.Dto;
-using itl_gerenciador_usuarios_api.Domain.Interface.Integrations;
 using itl_gerenciador_usuarios_api.Domain.Interface.Services.v1;
 using itl_gerenciador_usuarios_api.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -11,8 +10,9 @@ namespace itl_gerenciador_usuarios_api.Controllers
     public class InventarioController(IInventarioService inventarioService) : ControllerBase
     {
         private readonly IInventarioService _inventarioService = inventarioService;
+        
         [HttpPost]
-        public async Task<IActionResult> Send([FromBody] InventarioModel model)
+        public async Task<IActionResult> Send([FromBody] InvetarioRequestDto model)
         {
             try
             {
@@ -25,7 +25,8 @@ namespace itl_gerenciador_usuarios_api.Controllers
             }
         }
 
-        public async Task<ActionResult<InventarioModel>> Get(string idPersonagem)
+        [HttpGet]
+        public async Task<ActionResult<List<InventarioResponseDTO>>> Get(string idPersonagem)
         {
             try
             {
@@ -37,6 +38,6 @@ namespace itl_gerenciador_usuarios_api.Controllers
                 return BadRequest(ex.Message);
             }
 
-        }
+        }     
     }
 }
