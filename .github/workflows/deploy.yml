@@ -10,24 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.x'
-
-      - name: Restore dependencies
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
-
-      - name: Publish
-        run: dotnet publish --configuration Release --output ./publish --no-build
-
-      - name: Preparar pasta na VPS
+      - name: Deploy na VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -37,37 +20,19 @@ jobs:
           script: |
             set -e
 
-            mkdir -p /var/www/itl-gerenciador-usuarios-api
+            echo "Entrando na pasta do projeto..."
+            cd /var/www/itl-gerenciador-usuarios-api
 
-            if systemctl list-units --type=service | grep -q "itl-usuarios-api"; then
-              sudo systemctl stop itl-usuarios-api || true
-            fi
+            echo "Atualizando código..."
+            git fetch origin main
+            git reset --hard origin/main
 
-            if [ -d "/var/www/itl-gerenciador-usuarios-api/publish" ]; then
-              mv /var/www/itl-gerenciador-usuarios-api/publish /var/www/itl-gerenciador-usuarios-api/publish.backup-$(date +%Y%m%d-%H%M%S)
-            fi
+            echo "Recriando containers..."
+            docker compose down
+            docker compose up -d --build
 
-      - name: Copiar arquivos publicados para VPS
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          source: "publish/*"
-          target: "/var/www/itl-gerenciador-usuarios-api/publish"
-          strip_components: 1
+            echo "Limpando imagens antigas..."
+            docker image prune -f
 
-      - name: Iniciar serviço na VPS
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          script: |
-            set -e
-
-            sudo systemctl daemon-reload
-            sudo systemctl start itl-usuarios-api
-            sudo systemctl status itl-usuarios-api --no-pager
+            echo "Status dos containers:"
+            docker ps
