@@ -10,6 +10,7 @@ namespace itl_gerenciador_usuarios_api.Controllers
     [Route("[controller]")]
     public class PersonagemController(IPersonagemService personagemService) : ControllerBase
     {
+
         private readonly IPersonagemService _personagemService = personagemService;
 
         [HttpPost]
@@ -26,6 +27,22 @@ namespace itl_gerenciador_usuarios_api.Controllers
             }
 
         }
+
+        [HttpPut("retrato/{idPersonagem}/{idSessao}")]
+        public async Task<ActionResult> AtualizarRestrato([FromRoute] long idPersonagem, long idSessao, IFormFile portrait)
+        {
+            try
+            {
+                await _personagemService.AtualizarRetrato(idPersonagem, idSessao, portrait);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+        }
+
 
         [HttpPut("atributos")]
         public async Task<ActionResult> UpdateAtributos([FromBody] PersonagemAtributosModel atributos)

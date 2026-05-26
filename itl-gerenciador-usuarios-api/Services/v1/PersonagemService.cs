@@ -2,11 +2,15 @@
 using itl_gerenciador_usuarios_api.Domain.Interface.Repositories.v1;
 using itl_gerenciador_usuarios_api.Domain.Interface.Services.v1;
 using itl_gerenciador_usuarios_api.Domain.Models;
+using Org.BouncyCastle.Asn1.Ocsp;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace itl_gerenciador_usuarios_api.Services.v1
 {
-    public class PersonagemService(IPersonagemRepository personagemRepository, IPersonagemAtributoRepository personagemAtributoRepository, IPersonagemPericiaRepository personagemPericiaRepository) : IPersonagemService
+    public class PersonagemService(IPersonagemRepository personagemRepository, IWebHostEnvironment env,
+        IPersonagemAtributoRepository personagemAtributoRepository, IPersonagemPericiaRepository personagemPericiaRepository) : IPersonagemService
     {
+        private readonly IWebHostEnvironment _env = env;
         private readonly IPersonagemRepository _personagemRepository = personagemRepository;
         private readonly IPersonagemAtributoRepository _personagemAtributoRepository = personagemAtributoRepository;
         private readonly IPersonagemPericiaRepository _personagemPericiaRepository = personagemPericiaRepository;
@@ -65,6 +69,31 @@ namespace itl_gerenciador_usuarios_api.Services.v1
 
             await _personagemAtributoRepository.AddAsync(atributos, ct);
             await _personagemPericiaRepository.AddAsync(pericias, ct);
+        }       
+        
+        public async Task AtualizarRetrato(long idPersonagem, long idSessao, IFormFile portrait)
+        {
+            if (portrait == null || portrait.Length == 0)
+                throw new Exception("Nenhuma imagem enviada.");
+
+            var extensoesPermitidas = new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
+
+            var extensao = Path.GetExtension(portrait.FileName).ToLowerInvariant();
+
+            if (!extensoesPermitidas.Contains(extensao))
+                throw new Exception("Formato de imagem não permitido.");
+
+            var path = _env.WebRootPath;
+
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
+            var nomeArquivo = $"_potrait-{idPersonagem}_{idSessao}{extensao}";
+
+            var caminhoArquivo = Path.Combine(path, nomeArquivo);
+
+            await using var stream = new FileStream(caminhoArquivo, FileMode.Create);
+            await portrait.CopyToAsync(stream);            
         }        
 
         public async Task UpdateAtributos(PersonagemAtributosModel atributos, CancellationToken ct)
