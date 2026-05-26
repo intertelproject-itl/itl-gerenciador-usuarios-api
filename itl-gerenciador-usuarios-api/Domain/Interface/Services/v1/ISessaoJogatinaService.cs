@@ -6,8 +6,10 @@ namespace itl_gerenciador_usuarios_api.Domain.Interface.Services.v1
     {
         Task<List<SessaoJogatinaModel>> BuscarSessaoPublicaAtiva(CancellationToken cancellationToken);
         Task<SessaoJogatinaModel> BuscarSessaoPorId(long idSessao);
+        Task<List<PersonagemModel>> BuscarPersonagensPorSessao(long idSessao, CancellationToken cancellationToken);
         Task<PersonagemModel> BuscarPersonagemPorSessaoEUsuario(long idSessao, long idUsuario);
         Task<PersonagemPericiasModel> BuscarPersonagemPericiasPorSessaoEUsuario(long idPersonagem);
         Task<PersonagemAtributosModel> BuscarPersonagemAtributosPorSessaoEUsuario(long idPersonagem);
+        Task AcessarAsync(long idSessao, long idPersonagem);
     }
 }

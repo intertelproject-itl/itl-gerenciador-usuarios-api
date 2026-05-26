@@ -31,6 +31,15 @@ namespace itl_gerenciador_usuarios_api.Infraestructure.Repositories.v1
             return result.AsList();
         }
 
+        public async Task<List<PersonagemModel>> GetPessoasSessaoAsync(long idSessao, CancellationToken ct)
+        {
+            const string sql = @"select pb.* from personagens_base pb inner join sessao_jogatina sj on sj.id_sessao = pb.id_sessao where sj.id_sessao = @IdSessao";
+            var conn = _db.Database.GetDbConnection();
+            if (conn.State == System.Data.ConnectionState.Closed) await conn.OpenAsync();
+            var personagens = await conn.QueryAsync<PersonagemModel>(sql, new { IdSessao = idSessao });
+            return personagens.ToList() ?? throw new Exception("Nenhuma Sessão Encontrada");
+        }
+
         public async Task<SessaoJogatinaModel> GetByIdAsync(long idSessao)
         {
             const string sql = @"SELECT * FROM sessao_jogatina WHERE id_sessao = @IdSessao LIMIT 1";
@@ -38,6 +47,14 @@ namespace itl_gerenciador_usuarios_api.Infraestructure.Repositories.v1
             if (conn.State == System.Data.ConnectionState.Closed) await conn.OpenAsync();
             var sessao = await conn.QuerySingleOrDefaultAsync<SessaoJogatinaModel>(sql, new { IdSessao = idSessao });
             return sessao ?? throw new Exception("Nenhuma Sessão Encontrada");
+        }
+
+        public async Task AcessarSessao(long idSessao, long idPersonagem, CancellationToken ct)
+        {
+            const string sql = @"update personagens_base set  id_sessao = @IdSessao where id_personagem = @idPersonagem";
+            var conn = _db.Database.GetDbConnection();
+            if (conn.State == System.Data.ConnectionState.Closed) await conn.OpenAsync(ct);
+            await conn.QueryAsync<PersonagemModel>(new CommandDefinition(sql, new { IdSessao = idSessao, IdPersonagem = idPersonagem }, cancellationToken: ct));
         }
 
         public async Task<PersonagemModel> GetPersonagemBySessaoAndUsuarioAsync(long idSessao, long idUsuario, CancellationToken ct)

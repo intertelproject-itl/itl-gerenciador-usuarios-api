@@ -1,6 +1,5 @@
 ﻿using itl_gerenciador_usuarios_api.Domain.Interface.Services.v1;
 using itl_gerenciador_usuarios_api.Domain.Models;
-using itl_gerenciador_usuarios_api.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace itl_gerenciador_usuarios_api.Controllers
@@ -27,10 +26,17 @@ namespace itl_gerenciador_usuarios_api.Controllers
             return Ok(sessoesAtivas);
         }
 
-        [HttpPost("{idSessao}/Acessar")]
-        public async Task<ActionResult<SessaoJogatinaModel>> AcessarSessao(int idSessao)
+        [HttpGet("{idSessao}/pessoas")]
+        public async Task<ActionResult<List<PersonagemModel>>> BuscarPessoasSessao(int idSessao)
         {
-            //var sessoesAtivas = await _sessaoJogatinaService.BuscarSessaoPorId(idSessao);
+            var personagens = await _sessaoJogatinaService.BuscarPersonagensPorSessao(idSessao, new CancellationToken());
+            return Ok(personagens);
+        }
+
+        [HttpPost("{idSessao}/Acessar")]
+        public async Task<ActionResult<SessaoJogatinaModel>> AcessarSessao(int idSessao, int idPersonagem)
+        {
+            await _sessaoJogatinaService.AcessarAsync(idSessao, idPersonagem);
             return Ok();
         }
 

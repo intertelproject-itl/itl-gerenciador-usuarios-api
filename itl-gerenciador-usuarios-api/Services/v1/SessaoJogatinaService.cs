@@ -1,7 +1,6 @@
 ﻿using itl_gerenciador_usuarios_api.Domain.Interface.Repositories.v1;
 using itl_gerenciador_usuarios_api.Domain.Interface.Services.v1;
 using itl_gerenciador_usuarios_api.Domain.Models;
-using itl_gerenciador_usuarios_api.Domain.Models;
 
 namespace itl_gerenciador_usuarios_api.Services.v1
 {
@@ -27,6 +26,18 @@ namespace itl_gerenciador_usuarios_api.Services.v1
         {
             _logger.LogInformation($"Buscando sessão de jogatina com ID: {idSessao}...");
             return await _sessaoJogatinaRepository.GetByIdAsync(idSessao);
+        }
+
+        public async Task<List<PersonagemModel>> BuscarPersonagensPorSessao(long idSessao, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation($"Buscando personagens para sessão de jogatina com ID: {idSessao}...");
+            return await _sessaoJogatinaRepository.GetPessoasSessaoAsync(idSessao, cancellationToken);
+        }
+
+        public async Task AcessarAsync(long idSessao, long idPersonagem)
+        {
+            _logger.LogInformation($"Acessando sessão de jogatina...");
+            await _sessaoJogatinaRepository.AcessarSessao(idSessao, idPersonagem, new CancellationToken());
         }
 
         public async Task<PersonagemModel> BuscarPersonagemPorSessaoEUsuario(long idSessao, long idUsuario)

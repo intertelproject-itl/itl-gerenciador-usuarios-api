@@ -63,6 +63,35 @@ namespace itl_gerenciador_usuarios_api.Domain.Models
         [Column("data_criacao")]
         public DateTime? DataCriacao { get; set; }
 
+        [Required]
+        [Column("hp_maximo")]
+        public int HpMaximo { get; set; }
+
+        [Required]
+        [Column("hp_atual")]
+        public int HpAtual { get; set; }
+
+        [Required]
+        [Column("protecao_armadura_maxima")]
+        public int ProtecaoArmaduraMaxima { get; set; }
+
+        [Required]
+        [Column("protecao_armadura_atual")]
+        public int ProtecaoArmaduraAtual { get; set; }
+
+        [Required]
+        [Column("sorte_maxima")]
+        public int SorteMaxima { get; set; }
+
+        [Required]
+        [Column("sorte_atual")]
+        public int SorteAtual { get; set; }
+
+        [Required]
+        [Column("ferimentos_criticos")]
+        public string FerimentosCriticos { get; set; }
+
+
         [Column("portrait_base64")]
         public string PotraitBase64 { get; set; }
     }
