@@ -92,6 +92,11 @@ namespace itl_gerenciador_usuarios_api.Services.v1
 
             var caminhoArquivo = Path.Combine(path, nomeArquivo);
 
+            if (File.Exists(caminhoArquivo)) 
+            {
+                File.Delete(caminhoArquivo);
+            }
+
             await using var stream = new FileStream(caminhoArquivo, FileMode.Create);
             await portrait.CopyToAsync(stream);            
         }        
