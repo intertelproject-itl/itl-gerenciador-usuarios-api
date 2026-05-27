@@ -29,11 +29,11 @@ namespace itl_gerenciador_usuarios_api.Controllers
         }
 
         [HttpPut("briefing/{idPersonagem}")]
-        public async Task<ActionResult> AtualizarBriefing([FromRoute] int idPersonagem, [FromBody] string briefing)
+        public async Task<ActionResult> AtualizarBriefing([FromRoute] int idPersonagem, PersonagemAtualizaBriefingDTO briefingDto)
         {
             try
             {
-                await _personagemService.AtualizarBriefing(idPersonagem, briefing, new CancellationToken());
+                await _personagemService.AtualizarBriefing(idPersonagem, briefingDto.Briefing, new CancellationToken());
                 return NoContent();
             }
             catch (Exception ex)
