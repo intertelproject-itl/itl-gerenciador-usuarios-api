@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace itl_gerenciador_usuarios_api.Controllers
 {
     [ApiController]
-    [Route("[controller]/api")]
+    [Route("[controller]")]
     public class UsuarioController(IUsuarioService usuarioService) : ControllerBase
     {
         private readonly IUsuarioService _usuarioService = usuarioService;

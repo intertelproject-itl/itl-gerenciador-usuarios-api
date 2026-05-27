@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace itl_gerenciador_usuarios_api.Controllers
 {
     [ApiController]
-    [Route("[controller]/api")]
+    [Route("[controller]")]
     public class InventarioController(IInventarioService inventarioService) : ControllerBase
     {
         private readonly IInventarioService _inventarioService = inventarioService;

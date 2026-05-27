@@ -7,7 +7,7 @@ namespace itl_gerenciador_usuarios_api.Controllers
 {
     
     [ApiController]
-    [Route("[controller]/api")]
+    [Route("[controller]")]
     [AllowAnonymous]
     public class LoginController(ILoginService loginService) : ControllerBase
     {
