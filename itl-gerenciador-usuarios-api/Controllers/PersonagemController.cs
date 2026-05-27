@@ -28,6 +28,20 @@ namespace itl_gerenciador_usuarios_api.Controllers
 
         }
 
+        [HttpPut("briefing/{idPersonagem}")]
+        public async Task<ActionResult> AtualizarBriefing([FromRoute] int idPersonagem, [FromBody] string briefing)
+        {
+            try
+            {
+                await _personagemService.AtualizarBriefing(idPersonagem, briefing, new CancellationToken());
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPut("retrato/{idPersonagem}/{idSessao}")]
         public async Task<ActionResult> AtualizarRestrato([FromRoute] long idPersonagem, long idSessao, IFormFile portrait)
         {

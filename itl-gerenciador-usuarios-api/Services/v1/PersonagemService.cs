@@ -2,8 +2,6 @@
 using itl_gerenciador_usuarios_api.Domain.Interface.Repositories.v1;
 using itl_gerenciador_usuarios_api.Domain.Interface.Services.v1;
 using itl_gerenciador_usuarios_api.Domain.Models;
-using Org.BouncyCastle.Asn1.Ocsp;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace itl_gerenciador_usuarios_api.Services.v1
 {
@@ -69,8 +67,13 @@ namespace itl_gerenciador_usuarios_api.Services.v1
 
             await _personagemAtributoRepository.AddAsync(atributos, ct);
             await _personagemPericiaRepository.AddAsync(pericias, ct);
-        }       
-        
+        }
+
+        public async Task AtualizarBriefing(int idPersonagem, string briefing, CancellationToken ct)
+        {
+            await _personagemRepository.AtualizarBriefingAsync(idPersonagem, briefing, ct);
+        }
+
         public async Task AtualizarRetrato(long idPersonagem, long idSessao, IFormFile portrait)
         {
             if (portrait == null || portrait.Length == 0)
@@ -95,11 +98,11 @@ namespace itl_gerenciador_usuarios_api.Services.v1
             foreach (var file in Directory.GetFiles(path, $"_potrait-{idPersonagem}_{idSessao}.*"))
             {
                 File.Delete(file);
-            }           
+            }
 
             await using var stream = new FileStream(caminhoArquivo, FileMode.Create);
-            await portrait.CopyToAsync(stream);            
-        }        
+            await portrait.CopyToAsync(stream);
+        }
 
         public async Task UpdateAtributos(PersonagemAtributosModel atributos, CancellationToken ct)
         {

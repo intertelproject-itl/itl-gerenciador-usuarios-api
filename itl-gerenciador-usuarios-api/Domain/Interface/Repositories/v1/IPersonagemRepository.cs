@@ -5,6 +5,8 @@ namespace itl_gerenciador_usuarios_api.Domain.Interface.Repositories.v1
     public interface IPersonagemRepository
     {
         Task<long> AddAsync(PersonagemRequestDTO personagemDto, CancellationToken ct);
+
+        Task AtualizarBriefingAsync(int idPersonagem, string briefing, CancellationToken ct);
         Task AtualizarDadosPersonagemAsync(int idPersonagem, int hpMaximo, int protecaoMaxima, int humanidade, int sorteMaxima, CancellationToken ct);
         Task InfligirDanoAsync(int idPersonagem, int danoHp, int danoProtecao, int danoSorte, int humanidade, CancellationToken ct);
         Task CurarHpMaximoAsync(int idPersonagem, int hpCurado, bool hpTotal, CancellationToken ct);
