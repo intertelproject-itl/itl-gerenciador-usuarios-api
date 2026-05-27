@@ -1,16 +1,15 @@
 ﻿using itl_gerenciador_usuarios_api.Domain.Dto;
 using itl_gerenciador_usuarios_api.Domain.Interface.Services.v1;
-using itl_gerenciador_usuarios_api.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace itl_gerenciador_usuarios_api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("[controller]/api")]
     public class InventarioController(IInventarioService inventarioService) : ControllerBase
     {
         private readonly IInventarioService _inventarioService = inventarioService;
-        
+
         [HttpPost]
         public async Task<IActionResult> Send([FromBody] InvetarioRequestDto model)
         {
@@ -38,6 +37,6 @@ namespace itl_gerenciador_usuarios_api.Controllers
                 return BadRequest(ex.Message);
             }
 
-        }     
+        }
     }
 }

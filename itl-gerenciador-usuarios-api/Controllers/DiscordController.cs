@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace itl_gerenciador_usuarios_api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("[controller]/api")]
     public class DiscordController(IDiscordIntegration discordIntegration) : ControllerBase
     {
         private readonly IDiscordIntegration _discord = discordIntegration;

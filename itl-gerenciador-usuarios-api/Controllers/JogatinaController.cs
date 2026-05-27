@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace itl_gerenciador_usuarios_api.Controllers
 {
+    [ApiController]
+    [Route("[controller]/api")]
     public class JogatinaController(IJogatinaService jogatinaService) : ControllerBase
     {
         private readonly IJogatinaService _jogatinaService = jogatinaService;
