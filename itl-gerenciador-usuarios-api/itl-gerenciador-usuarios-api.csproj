@@ -39,7 +39,11 @@
 
   <ItemGroup>
     <Folder Include="Domain\Enum\" />
+    <Folder Include="wwwroot\armaduras\" />
+    <Folder Include="wwwroot\armas\corpoACorpo\" />
+    <Folder Include="wwwroot\armas\distancia\" />
     <Folder Include="wwwroot\public\" />
+    <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 
 

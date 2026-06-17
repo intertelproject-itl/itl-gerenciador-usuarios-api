@@ -13,6 +13,7 @@ namespace itl_gerenciador_usuarios_api.Services
             services.AddScoped<IPersonagemService, PersonagemService>();
             services.AddScoped<IInventarioService, InventarioService>();
             services.AddScoped<IJogatinaService, JogatinaService>();
+            services.AddScoped<ILojaNoturnaService, LojaNoturnaService>();
         }
     }
 }

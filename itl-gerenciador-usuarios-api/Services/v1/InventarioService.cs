@@ -5,29 +5,30 @@ using itl_gerenciador_usuarios_api.Infraestructure.NoSql;
 
 namespace itl_gerenciador_usuarios_api.Services.v1
 {
-    public class InventarioService(IMongoInventarioRepository<InventarioModel> repository, IWebHostEnvironment env) : IInventarioService
+    public class InventarioService(IMongoRepository<InventarioModel> repositoryInventario, IWebHostEnvironment env) : IInventarioService
     {
         private readonly IWebHostEnvironment _env = env;
-        private readonly IMongoInventarioRepository<InventarioModel> _repository = repository;
+        private readonly IMongoRepository<InventarioModel> _repositoryInventario = repositoryInventario;
 
         public async Task AdicionarItem(InvetarioRequestDto item, CancellationToken ct)
         {
-            await _repository.InsertAsync(new InventarioModel
+            var caminhoImagem = string.Empty;
+            if (!string.IsNullOrEmpty(item.Base64))
+                caminhoImagem = await SalvarBase64Public(item.Base64, "inventario", item.Nome);
+            await _repositoryInventario.InsertAsync(new InventarioModel
             {
                 Base64 = item.Base64,
                 Descricao = item.Descricao,
                 IdPersonagem = item.IdPersonagem,
-                Nome = item.Nome
-            }, ct);
-
-            if (!string.IsNullOrEmpty(item.Base64))
-                await SalvarBase64Public(item.Base64, item.Nome);
-
+                Nome = item.Nome,
+                CaminhoImagem = caminhoImagem
+            }, ct);           
         }
+        
 
         public async Task<List<InventarioResponseDTO>> ObterItens(string idPersonagem, CancellationToken ct)
         {
-            var itens = await _repository.GetByPersoangemIdAsync("IdPersonagem", idPersonagem, ct);
+            var itens = await _repositoryInventario.GetByPersoangemIdAsync("IdPersonagem", idPersonagem, ct);
 
             return itens == null
                 ? throw new Exception("Nenhum item encontrado para o personagem informado.")
@@ -35,23 +36,24 @@ namespace itl_gerenciador_usuarios_api.Services.v1
                 {
                     IdPersonagem = i.IdPersonagem,
                     Descricao = i.Descricao,
-                    Nome = i.Nome
+                    Nome = i.Nome,
+                    CaminhoImagem = i.CaminhoImagem
                 }).ToList();
         }
 
-        public async Task<string> ObterBase64(string id, CancellationToken ct)
+        public async Task<string> ObterBase64(string nomeArquivo, CancellationToken ct)
         {
-            var item = await _repository.GetBaseByIdAsync(id, ct);
+            var item = await _repositoryInventario.GetByIdAsync(nomeArquivo, ct);
             return item?.Base64 ?? string.Empty;
         }
 
-        private async Task SalvarBase64Public(string base64, string nomeImagem)
+        private async Task<string> SalvarBase64Public(string base64, string pasta, string nomeImagem)
         {
 
             if (string.IsNullOrWhiteSpace(base64))
                 throw new Exception("Base64 não informado.");
 
-            var rootPath = _env.WebRootPath;
+            var rootPath = $"{_env.WebRootPath}\\{pasta}";
 
             if (!Directory.Exists(rootPath))
                 Directory.CreateDirectory(rootPath);
@@ -78,6 +80,8 @@ namespace itl_gerenciador_usuarios_api.Services.v1
             var caminhoCompleto = Path.Combine(rootPath, nomeArquivo);
 
             await System.IO.File.WriteAllBytesAsync(caminhoCompleto, bytes);
+
+            return caminhoCompleto;
         }
     }
 }

@@ -13,5 +13,6 @@ namespace itl_gerenciador_usuarios_api.Domain.Models
         public string Nome { get; set; } = string.Empty;
         public string Descricao { get; set; } = string.Empty;
         public string Base64 { get; set; } = string.Empty;
+        public string CaminhoImagem { get; set; } = string.Empty;
     }
 }

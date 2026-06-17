@@ -137,7 +137,7 @@ namespace itl_gerenciador_usuarios_api.Infraestructure.Repositories.v1
             }
             if (protecaoMaxima > 0)
             {
-                sql = "UPDATE personagens_base SET protecao_maxima = @ProtecaoMaxima WHERE id_personagem = @IdPersonagem;";
+                sql = "UPDATE personagens_base SET protecao_armadura_maxima = @ProtecaoMaxima WHERE id_personagem = @IdPersonagem;";
                 await conn.ExecuteAsync(new CommandDefinition(sql, new { ProtecaoMaxima = protecaoMaxima, IdPersonagem = idPersonagem }, cancellationToken: ct));
             }
             if (humanidade > 0)
@@ -164,7 +164,7 @@ namespace itl_gerenciador_usuarios_api.Infraestructure.Repositories.v1
             }
             if (danoProtecao > 0)
             {
-                sql = "UPDATE personagens_base SET protecao_atual = GREATEST(protecao_atual - @DanoProtecao, 0) WHERE id_personagem = @IdPersonagem;";
+                sql = "UPDATE personagens_base SET protecao_armadura_atual = GREATEST(protecao_armadura_atual - @DanoProtecao, 0) WHERE id_personagem = @IdPersonagem;";
                 await conn.ExecuteAsync(new CommandDefinition(sql, new { DanoProtecao = danoProtecao, IdPersonagem = idPersonagem }, cancellationToken: ct));
             }
             if (danoSorte > 0)
@@ -211,12 +211,12 @@ namespace itl_gerenciador_usuarios_api.Infraestructure.Repositories.v1
             if (conn.State == ConnectionState.Closed) await conn.OpenAsync(ct);
             if (protecaoTotal)
             {
-                sql = "UPDATE personagens_base SET protecao_atual = protecao_maxima WHERE id_personagem = @IdPersonagem;";
+                sql = "UPDATE personagens_base SET protecao_armadura_atual = protecao_armadura_maxima WHERE id_personagem = @IdPersonagem;";
                 await conn.ExecuteAsync(new CommandDefinition(sql, new { IdPersonagem = idPersonagem }, cancellationToken: ct));
             }
             else if (protecaoCurada > 0)
             {
-                sql = "UPDATE personagens_base SET protecao_atual = LEAST(protecao_atual + @ProtecaoCurada, protecao_maxima) WHERE id_personagem = @IdPersonagem;";
+                sql = "UPDATE personagens_base SET protecao_armadura_atual = LEAST(protecao_armadura_atual + @ProtecaoCurada, protecao_armadura_maxima) WHERE id_personagem = @IdPersonagem;";
                 await conn.ExecuteAsync(new CommandDefinition(sql, new { ProtecaoCurada = protecaoCurada, IdPersonagem = idPersonagem }, cancellationToken: ct));
             }
         }

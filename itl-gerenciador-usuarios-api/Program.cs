@@ -43,7 +43,7 @@ builder.Services.AddApplictionModule();
 
 var mongoConn = builder.Configuration.GetConnectionString("MongoDB");
 builder.Services.AddSingleton<MongoDB.Driver.IMongoClient>(sp => new MongoDB.Driver.MongoClient(mongoConn));
-builder.Services.AddScoped(typeof(IMongoInventarioRepository<>), typeof(MongoInventarioRepository<>));
+builder.Services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
 
 // Discord integration
 builder.Services.Configure<DiscordSettings>(builder.Configuration.GetSection("Integrations:Discord"));

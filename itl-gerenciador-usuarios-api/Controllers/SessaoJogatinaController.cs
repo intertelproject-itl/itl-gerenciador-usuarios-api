@@ -47,14 +47,14 @@ namespace itl_gerenciador_usuarios_api.Controllers
             return Ok(personagem);
         }
 
-        [HttpGet("{idSessao}/pericias/{idUsuario}")]
+        [HttpGet("{idSessao}/pericias/{idPersonagem}")]
         public async Task<ActionResult<PersonagemPericiasModel>> BuscarPericiasPorSessaoEUsuario(long idPersonagem)
         {
             var pericias = await _sessaoJogatinaService.BuscarPersonagemPericiasPorSessaoEUsuario(idPersonagem);
             return Ok(pericias);
         }
 
-        [HttpGet("{idSessao}/atributos/{idUsuario}")]
+        [HttpGet("{idSessao}/atributos/{idPersonagem}")]
         public async Task<ActionResult<PersonagemAtributosModel>> BuscarAtributosPorSessaoEUsuario(long idPersonagem)
         {
             var atributos = await _sessaoJogatinaService.BuscarPersonagemAtributosPorSessaoEUsuario(idPersonagem);

@@ -4,16 +4,16 @@ using Microsoft.Extensions.Options;
 
 namespace itl_gerenciador_usuarios_api.Infraestructure.NoSql
 {
-    public class MongoInventarioRepository<T> : IMongoInventarioRepository<T>
+    public class MongoRepository<T> : IMongoRepository<T>
     {
         private readonly IMongoCollection<T> _collection;
 
-        public MongoInventarioRepository(IMongoClient client, IOptions<MongoDbSettings> settings)
+        public MongoRepository(IMongoClient client, IOptions<MongoDbSettings> settings)
         {
             var dbName = settings?.Value?.Database ?? "itl_app";
             var db = client.GetDatabase(dbName);
             // use the type name as collection name by convention
-            var collectionName = typeof(T).Name.ToLowerInvariant();
+            var collectionName = typeof(T).Name.Replace("Model", "");
             _collection = db.GetCollection<T>(collectionName);
         }
 
@@ -31,7 +31,7 @@ namespace itl_gerenciador_usuarios_api.Infraestructure.NoSql
             return res;
         }
 
-        public async Task<T?> GetBaseByIdAsync(string id, CancellationToken ct)
+        public async Task<T?> GetByIdAsync(string id, CancellationToken ct)
         {
             var filter = Builders<T>.Filter.Eq("_id", new ObjectId(id));
             var res = await _collection.Find(filter).FirstOrDefaultAsync(ct);
@@ -41,6 +41,12 @@ namespace itl_gerenciador_usuarios_api.Infraestructure.NoSql
         public async Task<IEnumerable<T>> GetAllAsync(CancellationToken ct)
         {
             var res = await _collection.Find(Builders<T>.Filter.Empty).ToListAsync(ct);
+            return res;
+        }
+
+        public async Task<T> GetFirstOrDefaultAsync(CancellationToken ct)
+        {
+            var res = await _collection.Find(Builders<T>.Filter.Empty).FirstOrDefaultAsync(ct);
             return res;
         }
 
