@@ -271,6 +271,14 @@ namespace itl_gerenciador_usuarios_api.Infraestructure.Repositories.v1
                 await conn.ExecuteAsync(new CommandDefinition(sql, new { Ferimento = ferimento, IdPersonagem = idPersonagem }, cancellationToken: ct));
             }
         }
+        
+        public async Task ComprarItem(int idPersonagem, decimal valor, CancellationToken ct)
+        {
+            var sql = "UPDATE personagens_base SET dinheiro = dinheiro - @Valor WHERE id_personagem = @IdPersonagem;";
+            var conn = _db.Database.GetDbConnection();
+            if (conn.State == ConnectionState.Closed) await conn.OpenAsync(ct);
+            await conn.ExecuteAsync(new CommandDefinition(sql, new { Valor = valor, IdPersonagem = idPersonagem }, cancellationToken: ct));
+        }
         #endregion Metodos Publicos
 
 

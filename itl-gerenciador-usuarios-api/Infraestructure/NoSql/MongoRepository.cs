@@ -24,10 +24,10 @@ namespace itl_gerenciador_usuarios_api.Infraestructure.NoSql
 
         }
 
-        public async Task<List<T>?> GetByPersoangemIdAsync(string chave, string valor, CancellationToken ct)
+        public async Task<T?> GetByPersoangemIdAsync(string chave, string valor, CancellationToken ct)
         {
             var filter = Builders<T>.Filter.Eq(chave, Convert.ToInt32(valor));
-            var res = await _collection.Find(filter).ToListAsync(ct);
+            var res = await _collection.Find(filter).FirstOrDefaultAsync(ct);
             return res;
         }
 

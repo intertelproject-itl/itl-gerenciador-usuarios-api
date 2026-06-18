@@ -15,5 +15,6 @@ namespace itl_gerenciador_usuarios_api.Domain.Interface.Repositories.v1
         Task InfligirFerimentoCriticoAsync(int idPersonagem, string ferimento, CancellationToken ct);
         Task CurarFerimentoAsync(int idPersonagem, string ferimento, bool curarTodos, CancellationToken ct);
         Task CurarHumanidadeMaximaAsync(int idPersonagem, int humanidadeCurada, bool humanidadeTotal, CancellationToken ct);
+        Task ComprarItem(int idPersonagem, decimal valor, CancellationToken ct);
     }
 }

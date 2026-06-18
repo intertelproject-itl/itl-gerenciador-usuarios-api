@@ -10,33 +10,5 @@ namespace itl_gerenciador_usuarios_api.Controllers
     {
         private readonly IInventarioService _inventarioService = inventarioService;
 
-        [HttpPost]
-        public async Task<IActionResult> Send([FromBody] InvetarioRequestDto model)
-        {
-            try
-            {
-                await _inventarioService.AdicionarItem(model, new CancellationToken());
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<List<InventarioResponseDTO>>> Get(string idPersonagem)
-        {
-            try
-            {
-                var itens = await _inventarioService.ObterItens(idPersonagem, new CancellationToken());
-                return Ok(itens);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
-        }
     }
 }

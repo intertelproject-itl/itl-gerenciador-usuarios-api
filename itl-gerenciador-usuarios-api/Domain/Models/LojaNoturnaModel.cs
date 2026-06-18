@@ -3,6 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace itl_gerenciador_usuarios_api.Domain.Models
 {
+    [BsonIgnoreExtraElements]
     public class LojaNoturnaModel
     {
         [BsonId]

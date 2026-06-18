@@ -1,15 +1,17 @@
 ﻿using itl_gerenciador_usuarios_api.Domain.Dto;
+using itl_gerenciador_usuarios_api.Domain.Interface.Repositories.v1;
 using itl_gerenciador_usuarios_api.Domain.Interface.Services.v1;
 using itl_gerenciador_usuarios_api.Domain.Models;
 using itl_gerenciador_usuarios_api.Infraestructure.NoSql;
 
 namespace itl_gerenciador_usuarios_api.Services.v1
 {
-    public class LojaNoturnaService(IMongoRepository<ArmasModel> armasRepository,
+    public class LojaNoturnaService(IMongoRepository<ArmasModel> armasRepository, IPersonagemRepository personagemRepository, IMongoRepository<InventarioModel> inventarioRepository,
         IMongoRepository<ArmaduraModel> armadurasRepository, IMongoRepository<ArmasCiberneticasModel> armasCiberneticasRepository,
         IMongoRepository<CiberneticasModel> ciberneticasRepository, IMongoRepository<LojaNoturnaModel> lojaNoturnaRepository) : ILojaNoturnaService
     {
-
+        private readonly IMongoRepository<InventarioModel> _inventarioRepository = inventarioRepository;
+        private readonly IPersonagemRepository _personagemRepository = personagemRepository;
         private readonly Random _random = new();
         private readonly IMongoRepository<ArmasModel> _armasRepository = armasRepository;
         private readonly IMongoRepository<ArmaduraModel> _armadurasRepository = armadurasRepository;
@@ -30,9 +32,9 @@ namespace itl_gerenciador_usuarios_api.Services.v1
         public async Task<LojaNoturnaModel> GerarLojaNoturna(int qtdArmas, int qtdArmaduras, int qtdArmasCiberneticas, int qtdCiberneticas, CancellationToken ct)
         {
             try
-            {                                    
+            {
                 var lojaCache = await _lojaNoturnaRepository.GetFirstOrDefaultAsync(ct);
-                if (lojaCache != null) 
+                if (lojaCache != null)
                     await _lojaNoturnaRepository.DeleteAsync(lojaCache.Id, ct);
 
                 var todosItens = new LojaNoturnaModel();
@@ -50,7 +52,7 @@ namespace itl_gerenciador_usuarios_api.Services.v1
             {
                 throw;
             }
-        }  
+        }
 
         public async Task<LojaNoturnaModel> ObterLojaNoturna(CancellationToken ct)
         {
@@ -58,6 +60,70 @@ namespace itl_gerenciador_usuarios_api.Services.v1
             if (lojaCache != null)
                 return lojaCache;
             throw new Exception("Nenhuma loja noturna disponível no momento.");
+        }
+
+        public async Task ComprarLojaNoturna(string id, decimal valor, int idPersonagem, CancellationToken ct)
+        {
+            var inventario = await _inventarioRepository.GetByPersoangemIdAsync("IdPersonagem", idPersonagem.ToString(), ct);
+            if (inventario == null)
+            {
+                await _inventarioRepository.InsertAsync(new InventarioModel
+                {
+                    IdPersonagem = idPersonagem,
+                    Armas = new List<ArmasModel>(),
+                    Armaduras = new List<ArmaduraModel>(),
+                    ArmasCiberneticas = new List<ArmasCiberneticasModel>(),
+                    Ciberneticas = new List<CiberneticasModel>()
+                }, ct);
+
+                inventario = await _inventarioRepository.GetByPersoangemIdAsync("IdPersonagem", idPersonagem.ToString(), ct);
+            }
+
+            var lojaNoturna = await ObterLojaNoturna(ct);
+
+            var arma = lojaNoturna.Armas?.FirstOrDefault(r => r.Id == id);
+            if (arma != null)
+            {
+                await _personagemRepository.ComprarItem(idPersonagem, valor, ct);
+                lojaNoturna.Armas?.Remove(arma);                
+                await _lojaNoturnaRepository.UpdateAsync(lojaNoturna.Id, lojaNoturna, ct);
+                inventario.Armas?.Add(arma);
+                await _inventarioRepository.UpdateAsync(inventario.Id, inventario, ct);
+                return;
+            }
+
+            var armadura = lojaNoturna.Armaduras?.FirstOrDefault(r => r.Id == id);
+            if (armadura != null)
+            {
+                await _personagemRepository.ComprarItem(idPersonagem, valor, ct);
+                lojaNoturna.Armaduras?.Remove(armadura);                
+                await _lojaNoturnaRepository.UpdateAsync(lojaNoturna.Id, lojaNoturna, ct);
+                inventario.Armaduras?.Add(armadura);
+                await _inventarioRepository.UpdateAsync(inventario.Id, inventario, ct);
+                return;
+            }
+
+            var armaCibernetica = lojaNoturna.ArmasCiberneticas?.FirstOrDefault(r => r.Id == id);
+            if (armaCibernetica != null)
+            {
+                await _personagemRepository.ComprarItem(idPersonagem, valor, ct);
+                lojaNoturna.ArmasCiberneticas?.Remove(armaCibernetica);                
+                await _lojaNoturnaRepository.UpdateAsync(lojaNoturna.Id, lojaNoturna, ct);
+                inventario.ArmasCiberneticas?.Add(armaCibernetica);
+                await _inventarioRepository.UpdateAsync(inventario.Id, inventario, ct);
+                return;
+            }
+
+            var cibernetica = lojaNoturna.Ciberneticas?.FirstOrDefault(r => r.Id == id);
+            if (cibernetica != null)
+            {
+                await _personagemRepository.ComprarItem(idPersonagem, valor, ct);
+                lojaNoturna.Ciberneticas?.Remove(cibernetica);                
+                await _lojaNoturnaRepository.UpdateAsync(lojaNoturna.Id, lojaNoturna, ct);
+                inventario.Ciberneticas?.Add(cibernetica);
+                await _inventarioRepository.UpdateAsync(inventario.Id, inventario, ct);
+                return;
+            }
         }
 
         public async Task<List<ArmasModel>> ObterTodasArmas(CancellationToken ct)
@@ -89,7 +155,7 @@ namespace itl_gerenciador_usuarios_api.Services.v1
             var armadurasDisponiveis = itens.Armaduras?.ToList();
             var armasCiberneticasDisponiveis = itens.ArmasCiberneticas?.ToList();
             var ciberneticasDisponiveis = itens.Ciberneticas?.ToList();
-    
+
             for (int i = 0; i < qtdArmas; i++)
             {
                 if (armasDisponiveis.Count == 0)

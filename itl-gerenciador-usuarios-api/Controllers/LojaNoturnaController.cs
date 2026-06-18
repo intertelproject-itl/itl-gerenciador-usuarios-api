@@ -25,6 +25,21 @@ namespace itl_gerenciador_usuarios_api.Controllers
             }
         }
 
+        [HttpPut("comprarLojaNoturna")]
+        public async Task<ActionResult> ComprarLojaNoturna(string id, decimal valor, int idPersonagem, CancellationToken ct)
+        {
+            try
+            {
+                await _lojaNoturnaService.ComprarLojaNoturna(id, valor, idPersonagem, ct);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
         [HttpGet("armaduras")]
         public async Task<ActionResult<List<ArmaduraModel>>> ObterTodasArmaduras()
         {
