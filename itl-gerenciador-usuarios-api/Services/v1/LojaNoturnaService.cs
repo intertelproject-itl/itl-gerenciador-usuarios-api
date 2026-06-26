@@ -204,7 +204,7 @@ namespace itl_gerenciador_usuarios_api.Services.v1
         private T SortearItemPorPeso<T>(List<T> model)
         {
             if (typeof(T) == typeof(ArmasModel))
-            {
+            { 
                 var armaModel = model.Cast<ArmasModel>().ToList();
                 var pesoTotal = armaModel.Sum(item => _pesosPorRaridade[item.Raridade]);
 
