@@ -66,7 +66,7 @@ namespace itl_gerenciador_usuarios_api.Services.v1
             };
 
             await _personagemAtributoRepository.AddAsync(atributos, ct);
-            await _personagemPericiaRepository.AddAsync(pericias, ct);
+            //await _personagemPericiaRepository.AddAsync(pericias, ct);
         }
 
         public async Task AtualizarBriefing(int idPersonagem, string briefing, CancellationToken ct)
@@ -111,7 +111,7 @@ namespace itl_gerenciador_usuarios_api.Services.v1
 
         public async Task UpdatePericias(PersonagemPericiasModel pericias, CancellationToken ct)
         {
-            await _personagemPericiaRepository.UpdateAsync(pericias, ct);
+            //await _personagemPericiaRepository.UpdateAsync(pericias, ct);
         }
     }
 }

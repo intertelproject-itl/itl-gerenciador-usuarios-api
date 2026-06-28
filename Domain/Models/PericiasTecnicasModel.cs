@@ -2,7 +2,7 @@
 
 namespace itl_gerenciador_usuarios_api.Domain.Models
 {
-    public class PericiasTecnicasModel
+    public class PericiasTecnicasModel : PericiasBaseModel
     {
         [JsonIgnore]
         [JsonProperty("id_pericia")]
@@ -57,6 +57,12 @@ namespace itl_gerenciador_usuarios_api.Domain.Models
 
         [JsonProperty("falsificacao_nivel")]
         public int FalsificacaoNivel { get; set; }
+
+        [JsonProperty("medicamentos_base")]
+        public int MedicamentosBase { get; set; }
+
+        [JsonProperty("medicamentos_nivel")]
+        public int MedicamentosNivel { get; set; }
 
         [JsonProperty("tecnologia_veiculo_terrestre_base")]
         public int TecnologiaVeiculoTerrestreBase { get; set; }

@@ -1,4 +1,5 @@
-﻿using itl_gerenciador_usuarios_api.Domain.Models;
+﻿using itl_gerenciador_usuarios_api.Domain.Dto;
+using itl_gerenciador_usuarios_api.Domain.Models;
 
 namespace itl_gerenciador_usuarios_api.Domain.Interface.Services.v1
 {
@@ -8,7 +9,7 @@ namespace itl_gerenciador_usuarios_api.Domain.Interface.Services.v1
         Task<SessaoJogatinaModel> BuscarSessaoPorId(long idSessao);
         Task<List<PersonagemModel>> BuscarPersonagensPorSessao(long idSessao, CancellationToken cancellationToken);
         Task<PersonagemModel> BuscarPersonagemPorSessaoEUsuario(long idSessao, long idUsuario);
-        Task<PersonagemPericiasModel> BuscarPersonagemPericiasPorSessaoEUsuario(long idPersonagem);
+        Task<PersonagemPericiaDTO> BuscarPersonagemPericiasPorSessaoEUsuario(long idPersonagem);
         Task<PersonagemAtributosModel> BuscarPersonagemAtributosPorSessaoEUsuario(long idPersonagem);
         Task AcessarAsync(long idSessao, long idPersonagem);
     }

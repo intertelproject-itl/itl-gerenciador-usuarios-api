@@ -2,7 +2,7 @@
 
 namespace itl_gerenciador_usuarios_api.Domain.Models
 {
-    public class PericiasConducaoModel
+    public class PericiasConducaoModel : PericiasBaseModel
     {
         [JsonIgnore]
         [JsonProperty("id_pericia")]

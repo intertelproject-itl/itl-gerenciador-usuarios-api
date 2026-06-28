@@ -1,4 +1,5 @@
-﻿using itl_gerenciador_usuarios_api.Domain.Interface.Services.v1;
+﻿using itl_gerenciador_usuarios_api.Domain.Dto;
+using itl_gerenciador_usuarios_api.Domain.Interface.Services.v1;
 using itl_gerenciador_usuarios_api.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -48,7 +49,7 @@ namespace itl_gerenciador_usuarios_api.Controllers
         }
 
         [HttpGet("{idSessao}/pericias/{idPersonagem}")]
-        public async Task<ActionResult<PersonagemPericiasModel>> BuscarPericiasPorSessaoEUsuario(long idPersonagem)
+        public async Task<ActionResult<PersonagemPericiaDTO>> BuscarPericiasPorSessaoEUsuario(long idPersonagem)
         {
             var pericias = await _sessaoJogatinaService.BuscarPersonagemPericiasPorSessaoEUsuario(idPersonagem);
             return Ok(pericias);

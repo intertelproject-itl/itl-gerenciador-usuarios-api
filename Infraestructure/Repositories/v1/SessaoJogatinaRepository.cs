@@ -80,7 +80,7 @@ namespace itl_gerenciador_usuarios_api.Infraestructure.Repositories.v1
             return pericias ?? throw new Exception("Nenhuma perícia encontrada para o personagem");
         }
 
-        public async Task<PersonagemAtributosModel> GetPersonagemAtributosBySessaoAndUsuarioAsync(long idPersonagem, CancellationToken ct)
+        public async Task<PersonagemAtributosModel> GetPersonagemAtributosByPersonagemIdAsync(long idPersonagem, CancellationToken ct)
         {
             const string sql = @"
                 SELECT pa.*
