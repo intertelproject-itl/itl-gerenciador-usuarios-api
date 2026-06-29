@@ -91,168 +91,278 @@ namespace itl_gerenciador_usuarios_api.Infraestructure.Repositories.v1
         {
             var conn = _db.Database.GetDbConnection();
             if (conn.State == ConnectionState.Closed) await conn.OpenAsync(ct);
+
             const string sql = @"
-                UPDATE pericias_armas
-                SET 
-                    arqueirismo_base = @ArqueirismoBase,
-                    arqueirismo_nivel = @ArqueirismoNivel,
-                    automatica_base = @AutomaticaBase,
-                    automatica_nivel = @AutomaticaNivel,
-                    armas_curtas_base = @ArmasCurtasBase,
-                    armas_curtas_nivel = @ArmasCurtasNivel,
-                    armas_pesadas_base = @ArmasPesadasBase,
-                    armas_pesadas_nivel = @ArmasPesadasNivel,
-                    fuzil_base = @FuzilBase,
-                    fuzil_nivel = @FuzilNivel,
-                    data_mudanca = NOW()
-                WHERE id_personagem = @IdPersonagem;
-            ";
+        UPDATE pericias_armas
+        SET 
+            arqueirismo_base = @ArqueirismoBase,
+            arqueirismo_nivel = @ArqueirismoNivel,
+            automatica_base = @AutomaticaBase,
+            automatica_nivel = @AutomaticaNivel,
+            armas_curtas_base = @ArmasCurtasBase,
+            armas_curtas_nivel = @ArmasCurtasNivel,
+            armas_pesadas_base = @ArmasPesadasBase,
+            armas_pesadas_nivel = @ArmasPesadasNivel,
+            fuzil_base = @FuzilBase,
+            fuzil_nivel = @FuzilNivel,
+            editavel = 0,
+            data_mudanca = NOW()
+        WHERE id_personagem = @IdPersonagem;
+    ";
+
             await conn.ExecuteAsync(new CommandDefinition(sql, periciasArmas, cancellationToken: ct));
-        }
-
-        public async Task UpdatePericiasCorporaisAsync(PericiasCorporaisModel periciasCorporais, CancellationToken ct)
-        {
-            var conn = _db.Database.GetDbConnection();
-            if (conn.State == ConnectionState.Closed) await conn.OpenAsync(ct);
-            const string sql = @"
-                UPDATE pericias_corporais
-                SET 
-                    atletismo_base = @AtletismoBase,
-                    atletismo_nivel = @AtletismoNivel,
-                    contorcionismo_base = @ContorcionismoBase,
-                    contorcionismo_nivel = @ContorcionismoNivel,
-                    dancar_base = @DancarBase,
-                    dancar_nivel = @DancarNivel,
-                    resistencia_base = @ResistenciaBase,
-                    resistencia_nivel = @ResistenciaNivel,
-                    resistencia_tortura_drogas_base = @ResistenciaTorturaDrogasBase,
-                    resistencia_tortura_drogas_nivel = @ResistenciaTorturaDrogasNivel,
-                    furtividade_base = @FurtividadeBase,
-                    furtividade_nivel = @FurtividadeNivel,
-                    data_mudanca = NOW()
-                WHERE id_personagem = @IdPersonagem;
-            ";
-            await conn.ExecuteAsync(new CommandDefinition(sql, periciasCorporais, cancellationToken: ct));
-        }
-
-        public async Task UpdatePericiasConducaoAsync(PericiasConducaoModel periciasConducao, CancellationToken ct)
-        {
-            var conn = _db.Database.GetDbConnection();
-            if (conn.State == ConnectionState.Closed) await conn.OpenAsync(ct);
-            const string sql = @"
-                UPDATE pericias_conducao
-                SET 
-                    dirigir_veiculo_terrestre_base = @DirigirVeiculoTerrestreBase,
-                    dirigir_veiculo_terrestre_nivel = @DirigirVeiculoTerrestreNivel,
-                    pilotar_veiculo_aereo_base = @PilotarVeiculoAereoBase,
-                    pilotar_veiculo_aereo_nivel = @PilotarVeiculoAereoNivel,
-                    pilotar_veiculo_maritimo_base = @PilotarVeiculoMaritimoBase,
-                    pilotar_veiculo_maritimo_nivel = @PilotarVeiculoMaritimoNivel,
-                    motocicleta_base = @MotocicletaBase,
-                    motocicleta_nivel = @MotocicletaNivel,
-                    data_mudanca = NOW()
-                WHERE id_personagem = @IdPersonagem;
-            ";
-            await conn.ExecuteAsync(new CommandDefinition(sql, periciasConducao, cancellationToken: ct));
-        }
-
-        public async Task UpdatePericiasLutaAsync(PericiasLutaModel periciasLuta, CancellationToken ct)
-        {
-            var conn = _db.Database.GetDbConnection();
-            if (conn.State == ConnectionState.Closed) await conn.OpenAsync(ct);
-            const string sql = @"
-                UPDATE pericias_luta
-                SET 
-                    briga_base = @BrigaBase,
-                    briga_nivel = @BrigaNivel,
-                    evasao_base = @EvasaoBase,
-                    evasao_nivel = @EvasaoNivel,
-                    artes_marciais_base = @ArtesMarciaisBase,
-                    artes_marciais_nivel = @ArtesMarciaisNivel,
-                    armas_brancas_base = @ArmasBrancasBase,
-                    armas_brancas_nivel = @ArmasBrancasNivel,
-                    data_mudanca = NOW()
-                WHERE id_personagem = @IdPersonagem;
-            ";
-            await conn.ExecuteAsync(new CommandDefinition(sql, periciasLuta, cancellationToken: ct));
         }
 
         public async Task UpdatePericiasAtencaoAsync(PericiasAtencaoModel periciasAtencao, CancellationToken ct)
         {
             var conn = _db.Database.GetDbConnection();
             if (conn.State == ConnectionState.Closed) await conn.OpenAsync(ct);
+
             const string sql = @"
-                UPDATE pericias_atencao
-                SET 
-                    observacao_base = @ObservacaoBase,
-                    observacao_nivel = @ObservacaoNivel,
-                    percepcao_base = @PercepcaoBase,
-                    percepcao_nivel = @PercepcaoNivel,
-                    raciocinio_base = @RaciocinioBase,
-                    raciocinio_nivel = @RaciocinioNivel,
-                    data_mudanca = NOW()
-                WHERE id_personagem = @IdPersonagem;
-            ";
+        UPDATE pericias_atencao
+        SET 
+            concentracao_base = @ConcentracaoBase,
+            concentracao_nivel = @ConcentracaoNivel,
+            ocultar_revelar_objeto_base = @OcultarRevelarObjetoBase,
+            ocultar_revelar_objeto_nivel = @OcultarRevelarObjetoNivel,
+            leitura_labial_base = @LeituraLabialBase,
+            leitura_labial_nivel = @LeituraLabialNivel,
+            percepcao_base = @PercepcaoBase,
+            percepcao_nivel = @PercepcaoNivel,
+            rastrear_base = @RastrearBase,
+            rastrear_nivel = @RastrearNivel,
+            editavel = 0,
+            data_mudanca = NOW()
+        WHERE id_personagem = @IdPersonagem;
+    ";
+
             await conn.ExecuteAsync(new CommandDefinition(sql, periciasAtencao, cancellationToken: ct));
+        }
+
+        public async Task UpdatePericiasConducaoAsync(PericiasConducaoModel periciasConducao, CancellationToken ct)
+        {
+            var conn = _db.Database.GetDbConnection();
+            if (conn.State == ConnectionState.Closed) await conn.OpenAsync(ct);
+
+            const string sql = @"
+        UPDATE pericias_conducao
+        SET 
+            dirigir_veiculo_terrestre_base = @DirigirVeiculoTerrestreBase,
+            dirigir_veiculo_terrestre_nivel = @DirigirVeiculoTerrestreNivel,
+            pilotar_veiculo_aereo_base = @PilotarVeiculoAereoBase,
+            pilotar_veiculo_aereo_nivel = @PilotarVeiculoAereoNivel,
+            pilotar_veiculo_maritimo_base = @PilotarVeiculoMaritimoBase,
+            pilotar_veiculo_maritimo_nivel = @PilotarVeiculoMaritimoNivel,
+            motocicleta_base = @MotocicletaBase,
+            motocicleta_nivel = @MotocicletaNivel,
+            editavel = 0,
+            data_mudanca = NOW()
+        WHERE id_personagem = @IdPersonagem;
+    ";
+
+            await conn.ExecuteAsync(new CommandDefinition(sql, periciasConducao, cancellationToken: ct));
+        }
+
+        public async Task UpdatePericiasCorporaisAsync(PericiasCorporaisModel periciasCorporais, CancellationToken ct)
+        {
+            var conn = _db.Database.GetDbConnection();
+            if (conn.State == ConnectionState.Closed) await conn.OpenAsync(ct);
+
+            const string sql = @"
+        UPDATE pericias_corporais
+        SET 
+            atletismo_base = @AtletismoBase,
+            atletismo_nivel = @AtletismoNivel,
+            contorcionismo_base = @ContorcionismoBase,
+            contorcionismo_nivel = @ContorcionismoNivel,
+            dancar_base = @DancarBase,
+            dancar_nivel = @DancarNivel,
+            resistencia_base = @ResistenciaBase,
+            resistencia_nivel = @ResistenciaNivel,
+            resistencia_tortura_drogas_base = @ResistenciaTorturaDrogasBase,
+            resistencia_tortura_drogas_nivel = @ResistenciaTorturaDrogasNivel,
+            furtividade_base = @FurtividadeBase,
+            furtividade_nivel = @FurtividadeNivel,
+            editavel = 0,
+            data_mudanca = NOW()
+        WHERE id_personagem = @IdPersonagem;
+    ";
+
+            await conn.ExecuteAsync(new CommandDefinition(sql, periciasCorporais, cancellationToken: ct));
         }
 
         public async Task UpdatePericiasEducacaoAsync(PericiasEducacaoModel periciasEducacao, CancellationToken ct)
         {
             var conn = _db.Database.GetDbConnection();
             if (conn.State == ConnectionState.Closed) await conn.OpenAsync(ct);
+
             const string sql = @"
-                UPDATE pericias_educacao
-                SET 
-                    cultura_base = @CulturaBase,
-                    cultura_nivel = @CulturaNivel,
-                    historia_base = @HistoriaBase,
-                    historia_nivel = @HistoriaNivel,
-                    linguistica_base = @LinguisticaBase,
-                    linguistica_nivel = @LinguisticaNivel,
-                    data_mudanca = NOW()
-                WHERE id_personagem = @IdPersonagem;
-            ";
+        UPDATE pericias_educacao
+        SET 
+            idioma_base = @IdiomaBase,
+            idioma_nivel = @IdiomaNivel,
+            especialista_local_base = @EspecialistaLocalBase,
+            especialista_local_nivel = @EspecialistaLocalNivel,
+            contabilidade_base = @ContabilidadeBase,
+            contabilidade_nivel = @ContabilidadeNivel,
+            lidar_com_animais_base = @LidarComAnimaisBase,
+            lidar_com_animais_nivel = @LidarComAnimaisNivel,
+            burocracia_base = @BurocraciaBase,
+            burocracia_nivel = @BurocraciaNivel,
+            negocios_base = @NegociosBase,
+            negocios_nivel = @NegociosNivel,
+            composicao_base = @ComposicaoBase,
+            composicao_nivel = @ComposicaoNivel,
+            criminologia_base = @CriminologiaBase,
+            criminologia_nivel = @CriminologiaNivel,
+            criptografia_base = @CriptografiaBase,
+            criptografia_nivel = @CriptografiaNivel,
+            deducao_base = @DeducaoBase,
+            deducao_nivel = @DeducaoNivel,
+            educacao_base = @EducacaoBase,
+            educacao_nivel = @EducacaoNivel,
+            apostar_base = @ApostarBase,
+            apostar_nivel = @ApostarNivel,
+            pesquisa_biblioteca_base = @PesquisaBibliotecaBase,
+            pesquisa_biblioteca_nivel = @PesquisaBibliotecaNivel,
+            estrategia_base = @EstrategiaBase,
+            estrategia_nivel = @EstrategiaNivel,
+            sobrevivencia_base = @SobrevivenciaBase,
+            sobrevivencia_nivel = @SobrevivenciaNivel,
+            ciencia_base = @CienciaBase,
+            ciencia_nivel = @CienciaNivel,
+            editavel = 0,
+            data_mudanca = NOW()
+        WHERE id_personagem = @IdPersonagem;
+    ";
+
             await conn.ExecuteAsync(new CommandDefinition(sql, periciasEducacao, cancellationToken: ct));
         }
 
-        public async Task UpdatePericiasTecnicasAsync(PericiasTecnicasModel periciasTecnicas, CancellationToken ct)
+        public async Task UpdatePericiasLutaAsync(PericiasLutaModel periciasLuta, CancellationToken ct)
         {
             var conn = _db.Database.GetDbConnection();
             if (conn.State == ConnectionState.Closed) await conn.OpenAsync(ct);
+
             const string sql = @"
-                UPDATE pericias_tecnicas
-                SET 
-                    informatica_base = @InformaticaBase,
-                    informatica_nivel = @InformaticaNivel,
-                    medicina_base = @MedicinaBase,
-                    medicina_nivel = @MedicinaNivel,
-                    engenharia_base = @EngenhariaBase,
-                    engenharia_nivel = @EngenhariaNivel,
-                    data_mudanca = NOW()
-                WHERE id_personagem = @IdPersonagem;
-            ";
-            await conn.ExecuteAsync(new CommandDefinition(sql, periciasTecnicas, cancellationToken: ct));
+        UPDATE pericias_luta
+        SET 
+            briga_base = @BrigaBase,
+            briga_nivel = @BrigaNivel,
+            evasao_base = @EvasaoBase,
+            evasao_nivel = @EvasaoNivel,
+            artes_marciais_base = @ArtesMarciaisBase,
+            artes_marciais_nivel = @ArtesMarciaisNivel,
+            armas_brancas_base = @ArmasBrancasBase,
+            armas_brancas_nivel = @ArmasBrancasNivel,
+            editavel = 0,
+            data_mudanca = NOW()
+        WHERE id_personagem = @IdPersonagem;
+    ";
+
+            await conn.ExecuteAsync(new CommandDefinition(sql, periciasLuta, cancellationToken: ct));
+        }
+
+        public async Task UpdatePericiasPerformanceAsync(PericiasPerformanceModel periciasPerformance, CancellationToken ct)
+        {
+            var conn = _db.Database.GetDbConnection();
+            if (conn.State == ConnectionState.Closed) await conn.OpenAsync(ct);
+
+            const string sql = @"
+        UPDATE pericias_performance
+        SET 
+            atuacao_base = @AtuacaoBase,
+            atuacao_nivel = @AtuacaoNivel,
+            tocar_instrumento_base = @TocarInstrumentoBase,
+            tocar_instrumento_nivel = @TocarInstrumentoNivel,
+            editavel = 0,
+            data_mudanca = NOW()
+        WHERE id_personagem = @IdPersonagem;
+    ";
+
+            await conn.ExecuteAsync(new CommandDefinition(sql, periciasPerformance, cancellationToken: ct));
         }
 
         public async Task UpdatePericiasSociaisAsync(PericiasSociaisModel periciasSociais, CancellationToken ct)
         {
             var conn = _db.Database.GetDbConnection();
             if (conn.State == ConnectionState.Closed) await conn.OpenAsync(ct);
+
             const string sql = @"
-                UPDATE pericias_sociais
-                SET 
-                    persuasao_base = @PersuasaoBase,
-                    persuasao_nivel = @PersuasaoNivel,
-                    intimidacao_base = @IntimidacaoBase,
-                    intimidacao_nivel = @IntimidacaoNivel,
-                    negociacao_base = @NegociacaoBase,
-                    negociacao_nivel = @NegociacaoNivel,
-                    data_mudanca = NOW()
-                WHERE id_personagem = @IdPersonagem;
-            ";
+        UPDATE pericias_sociais
+        SET 
+            suborno_base = @SubornoBase,
+            suborno_nivel = @SubornoNivel,
+            oratoria_base = @OratoriaBase,
+            oratoria_nivel = @OratoriaNivel,
+            percepcao_humana_base = @PercepcaoHumanaBase,
+            percepcao_humana_nivel = @PercepcaoHumanaNivel,
+            interrogatorio_base = @InterrogatorioBase,
+            interrogatorio_nivel = @InterrogatorioNivel,
+            persuasao_base = @PersuasaoBase,
+            persuasao_nivel = @PersuasaoNivel,
+            cuidados_pessoais_base = @CuidadosPessoaisBase,
+            cuidados_pessoais_nivel = @CuidadosPessoaisNivel,
+            malandragem_base = @MalandragemBase,
+            malandragem_nivel = @MalandragemNivel,
+            negociacao_base = @NegociacaoBase,
+            negociacao_nivel = @NegociacaoNivel,
+            roupa_estilo_base = @RoupaEstiloBase,
+            roupa_estilo_nivel = @RoupaEstiloNivel,
+            editavel = 0,
+            data_mudanca = NOW()
+        WHERE id_personagem = @IdPersonagem;
+    ";
+
             await conn.ExecuteAsync(new CommandDefinition(sql, periciasSociais, cancellationToken: ct));
         }
-        
+
+        public async Task UpdatePericiasTecnicasAsync(PericiasTecnicasModel periciasTecnicas, CancellationToken ct)
+        {
+            var conn = _db.Database.GetDbConnection();
+            if (conn.State == ConnectionState.Closed) await conn.OpenAsync(ct);
+
+            const string sql = @"
+        UPDATE pericias_tecnicas
+        SET 
+            tecnologia_veiculos_aereos_base = @TecnologiaVeiculosAereosBase,
+            tecnologia_veiculos_aereos_nivel = @TecnologiaVeiculosAereosNivel,
+            tecnologia_basica_base = @TecnologiaBasicaBase,
+            tecnologia_basica_nivel = @TecnologiaBasicaNivel,
+            cibertecnologia_base = @CibertecnologiaBase,
+            cibertecnologia_nivel = @CibertecnologiaNivel,
+            demolicoes_base = @DemolicoesBase,
+            demolicoes_nivel = @DemolicoesNivel,
+            eletronica_tec_seguranca_base = @EletronicaTecSegurancaBase,
+            eletronica_tec_seguranca_nivel = @EletronicaTecSegurancaNivel,
+            primeiros_socorros_base = @PrimeirosSocorrosBase,
+            primeiros_socorros_nivel = @PrimeirosSocorrosNivel,
+            falsificacao_base = @FalsificacaoBase,
+            falsificacao_nivel = @FalsificacaoNivel,
+            tecnologia_veiculo_terrestre_base = @TecnologiaVeiculoTerrestreBase,
+            tecnologia_veiculo_terrestre_nivel = @TecnologiaVeiculoTerrestreNivel,
+            pintar_desenhar_esculpir_base = @PintarDesenharEsculpirBase,
+            pintar_desenhar_esculpir_nivel = @PintarDesenharEsculpirNivel,
+            medicamentos_base = @MedicamentosBase,
+            medicamentos_nivel = @MedicamentosNivel,
+            fotografia_filmagem_base = @FotografiaFilmagemBase,
+            fotografia_filmagem_nivel = @FotografiaFilmagemNivel,
+            arrombamento_base = @ArrombamentoBase,
+            arrombamento_nivel = @ArrombamentoNivel,
+            furto_base = @FurtoBase,
+            furto_nivel = @FurtoNivel,
+            tecnologia_veiculo_maritimo_base = @TecnologiaVeiculoMaritimoBase,
+            tecnologia_veiculo_maritimo_nivel = @TecnologiaVeiculoMaritimoNivel,
+            tecnologia_armas_armeiro_base = @TecnologiaArmasArmeiroBase,
+            tecnologia_armas_armeiro_nivel = @TecnologiaArmasArmeiroNivel,
+            editavel = 0,
+            data_mudanca = NOW()
+        WHERE id_personagem = @IdPersonagem;
+    ";
+
+            await conn.ExecuteAsync(new CommandDefinition(sql, periciasTecnicas, cancellationToken: ct));
+        }
+
         #endregion Atualizar Pericias por ID do Personagem
 
         #region Inserir Pericias por ID do Personagem

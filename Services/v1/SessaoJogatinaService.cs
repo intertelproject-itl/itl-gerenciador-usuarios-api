@@ -94,7 +94,7 @@ namespace itl_gerenciador_usuarios_api.Services.v1
             personagemPericias.PericiasTecnicas.AplicarAtributosBase(_periciasPorAtributo, valoresAtributos);
 
             return personagemPericias;
-        }
+        }     
 
         public async Task<PersonagemAtributosModel> BuscarPersonagemAtributosPorSessaoEUsuario(long idPersonagem)
         {

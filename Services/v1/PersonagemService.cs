@@ -13,6 +13,20 @@ namespace itl_gerenciador_usuarios_api.Services.v1
         private readonly IPersonagemAtributoRepository _personagemAtributoRepository = personagemAtributoRepository;
         private readonly IPersonagemPericiaRepository _personagemPericiaRepository = personagemPericiaRepository;
 
+
+        public async Task AtualizarValorPericias(PersonagemPericiaDTO personagemPericia)
+        {
+            await _personagemPericiaRepository.UpdatePericiasLutaAsync(personagemPericia.PericiasLuta, new CancellationToken());
+            await _personagemPericiaRepository.UpdatePericiasAtencaoAsync(personagemPericia.PericiasAtencao, new CancellationToken());
+            await _personagemPericiaRepository.UpdatePericiasConducaoAsync(personagemPericia.PericiasConducao, new CancellationToken());
+            await _personagemPericiaRepository.UpdatePericiasCorporaisAsync(personagemPericia.PericiasCorporais, new CancellationToken());
+            await _personagemPericiaRepository.UpdatePericiasEducacaoAsync(personagemPericia.PericiasEducacao, new CancellationToken());
+            await _personagemPericiaRepository.UpdatePericiasPerformanceAsync(personagemPericia.PericiasPerformance, new CancellationToken());
+            await _personagemPericiaRepository.UpdatePericiasSociaisAsync(personagemPericia.PericiasSociais, new CancellationToken());
+            await _personagemPericiaRepository.UpdatePericiasTecnicasAsync(personagemPericia.PericiasTecnicas, new CancellationToken());
+            await _personagemPericiaRepository.UpdatePericiasArmasAsync(personagemPericia.PericiasArmas, new CancellationToken());
+        }
+
         public async Task RegistrarPersonagem(PersonagemRequestDTO personagem, CancellationToken ct)
         {
             var idPersonagem = await _personagemRepository.AddAsync(personagem, ct);

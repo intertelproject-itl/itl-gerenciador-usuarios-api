@@ -44,6 +44,8 @@ namespace itl_gerenciador_usuarios_api.Domain.Interface.Repositories.v1
 
         #region Atualizar Pericias por ID do Personagem
 
+        Task UpdatePericiasPerformanceAsync(PericiasPerformanceModel periciasPerformance, CancellationToken ct);
+
         Task UpdatePericiasArmasAsync(
             PericiasArmasModel periciasArmas,
             CancellationToken ct);

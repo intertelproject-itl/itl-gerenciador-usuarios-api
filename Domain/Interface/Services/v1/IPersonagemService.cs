@@ -10,5 +10,6 @@ namespace itl_gerenciador_usuarios_api.Domain.Interface.Services.v1
         Task UpdateAtributos(PersonagemAtributosModel atributos, CancellationToken ct);
         Task UpdatePericias(PersonagemPericiasModel pericias, CancellationToken ct);
         Task AtualizarRetrato(long idPersonagem, long idSessao, IFormFile portrait);
+        Task AtualizarValorPericias(PersonagemPericiaDTO personagemPericia);
     }
 }

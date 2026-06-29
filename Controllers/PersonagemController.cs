@@ -73,11 +73,11 @@ namespace itl_gerenciador_usuarios_api.Controllers
         }
 
         [HttpPut("pericias")]
-        public async Task<ActionResult> UpdatePericias([FromBody] PersonagemPericiasModel pericias)
+        public async Task<ActionResult> UpdatePericias([FromBody] PersonagemPericiaDTO pericias)
         {
             try
             {
-                await _personagemService.UpdatePericias(pericias, new CancellationToken());
+                await _personagemService.AtualizarValorPericias(pericias);
                 return NoContent();
             }
             catch (Exception ex)
