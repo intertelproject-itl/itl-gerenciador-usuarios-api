@@ -7,15 +7,15 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["itl-gerenciador-usuarios-api/itl-gerenciador-usuarios-api.csproj", "itl-gerenciador-usuarios-api/"]
-RUN dotnet restore "./itl-gerenciador-usuarios-api/itl-gerenciador-usuarios-api.csproj"
+COPY ["itl-gerenciador-usuarios-api.csproj", "itl-gerenciador-usuarios-api/"]
+RUN dotnet restore "itl-gerenciador-usuarios-api.csproj"
 COPY . .
 WORKDIR "/src/itl-gerenciador-usuarios-api"
-RUN dotnet build "./itl-gerenciador-usuarios-api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "itl-gerenciador-usuarios-api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./itl-gerenciador-usuarios-api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "itl-gerenciador-usuarios-api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
