@@ -22,6 +22,11 @@ namespace itl_gerenciador_usuarios_api.Infraestructure.NoSql
             await _collection.InsertOneAsync(item, cancellationToken: ct);
         }
 
+        public async Task Insert(MensagemChatModel item)
+        {
+            _collection.InsertOne(item);
+        }
+
         public async Task<List<MensagemChatModel>> BuscarEntreHorariosAsync(int idSessao, DateTime horarioInicio, DateTime horarioFim, CancellationToken ct)
         {
             var filtro = Builders<MensagemChatModel>.Filter.And(

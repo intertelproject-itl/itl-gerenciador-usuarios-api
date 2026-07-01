@@ -65,14 +65,23 @@ namespace itl_gerenciador_usuarios_api.Controllers
         [HttpPost("{idSessao}/chat/{NomePersonagem}")]
         public async Task<ActionResult> EnviarMensageChat(long idSessao, string nomePersonagem, string mensagem)
         {
-            await _sessaoJogatinaService.NovaMensagem(new MensagemChatModel
+            try
             {
-                DataCriacao = DateTime.Now,
-                IdSessao = (int)idSessao,
-                Mensagem = mensagem,
-                NomePersonagem = nomePersonagem
-            });
-            return Ok();
+                await _sessaoJogatinaService.NovaMensagem(new MensagemChatModel
+                {
+                    DataCriacao = DateTime.Now,
+                    IdSessao = (int)idSessao,
+                    Mensagem = mensagem,
+                    NomePersonagem = nomePersonagem
+                });
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex);
+            }
+            
         }
 
         [HttpGet("{idSessao}/chat")]
