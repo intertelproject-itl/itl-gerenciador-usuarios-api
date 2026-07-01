@@ -11,6 +11,8 @@ namespace itl_gerenciador_usuarios_api.Domain.Interface.Services.v1
         Task<List<ArmasCiberneticasModel>> ObterTodasArmasCiberneticas(CancellationToken ct);
         Task<List<CiberneticasModel>> ObterTodasCiberneticas(CancellationToken ct);
         Task<LojaNoturnaModel> ObterLojaNoturna(CancellationToken ct);
-        Task ComprarLojaNoturna(string id, decimal valor, int idPersonagem, CancellationToken ct);
+        Task ComprarItemComum(string categoria, string idMongo, long valor, int idPersonagem, CancellationToken ct);
+        Task ComprarLojaNoturna(string categoria, string idMongo, long valor, int idPersonagem, CancellationToken ct);
+        Task<LojaNoturnaModel> ObterLojaComun(CancellationToken ct);
     }
 }

@@ -11,6 +11,9 @@ namespace itl_gerenciador_usuarios_api.Domain.Interface.Services.v1
         Task<PersonagemModel> BuscarPersonagemPorSessaoEUsuario(long idSessao, long idUsuario);
         Task<PersonagemPericiaDTO> BuscarPersonagemPericiasPorSessaoEUsuario(long idPersonagem);
         Task<PersonagemAtributosModel> BuscarPersonagemAtributosPorSessaoEUsuario(long idPersonagem);
+        Task<List<MensagemChatModel>> CarregarChat(int idSessao);
+        Task NovaMensagem(MensagemChatModel mensagem);
+
         Task AcessarAsync(long idSessao, long idPersonagem);        
     }
 }

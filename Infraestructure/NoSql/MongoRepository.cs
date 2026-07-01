@@ -1,6 +1,7 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Microsoft.Extensions.Options;
+using itl_gerenciador_usuarios_api.Domain.Models;
 
 namespace itl_gerenciador_usuarios_api.Infraestructure.NoSql
 {
@@ -22,12 +23,19 @@ namespace itl_gerenciador_usuarios_api.Infraestructure.NoSql
             await _collection.InsertOneAsync(item, cancellationToken: ct);
 
 
-        }
+        }        
 
-        public async Task<T?> GetByPersoangemIdAsync(string chave, string valor, CancellationToken ct)
+        public async Task<T?> GetByChaveAsync(string chave, string valor, CancellationToken ct)
         {
             var filter = Builders<T>.Filter.Eq(chave, Convert.ToInt32(valor));
             var res = await _collection.Find(filter).FirstOrDefaultAsync(ct);
+            return res;
+        }
+
+        public async Task<List<T?>> GetListByChaveAsync(string chave, string valor, CancellationToken ct)
+        {
+            var filter = Builders<T>.Filter.Eq(chave, valor);
+            var res = await _collection.Find(filter).ToListAsync(ct);
             return res;
         }
 

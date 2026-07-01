@@ -51,6 +51,12 @@ namespace itl_gerenciador_usuarios_api.Domain.Models
         [Required]
         [Column("data_atualizacao")]
         public DateTime DataAtualizacao { get; set; }
+
+        [Column("loja_noturna")]
+        public int LojaNoturna { get; set; } = 0;
+
+        [Column("loja_comun")]
+        public int LojaComun { get; set; } = 0;
     }
 }
 

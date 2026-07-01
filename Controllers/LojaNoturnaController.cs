@@ -11,70 +11,13 @@ namespace itl_gerenciador_usuarios_api.Controllers
     {
         private readonly ILojaNoturnaService _lojaNoturnaService = lojaNoturnaService;
 
-        [HttpGet("armas")]
-        public async Task<ActionResult<List<ArmasModel>>> ObterTodasArmas()
+        [HttpGet("obterLojaComun")]
+        public async Task<ActionResult> GetLojaComun()
         {
             try
             {
-                var armas = await _lojaNoturnaService.ObterTodasArmas(new CancellationToken());
-                return Ok(armas);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpPut("comprarLojaNoturna")]
-        public async Task<ActionResult> ComprarLojaNoturna(string id, decimal valor, int idPersonagem, CancellationToken ct)
-        {
-            try
-            {
-                await _lojaNoturnaService.ComprarLojaNoturna(id, valor, idPersonagem, ct);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-
-        [HttpGet("armaduras")]
-        public async Task<ActionResult<List<ArmaduraModel>>> ObterTodasArmaduras()
-        {
-            try
-            {
-                var armaduras = await _lojaNoturnaService.ObterTodasArmaduras(new CancellationToken());
-                return Ok(armaduras);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpGet("armas-ciberneticas")]
-        public async Task<ActionResult<List<ArmasCiberneticasModel>>> ObterTodasArmasCiberneticas()
-        {
-            try
-            {
-                var armasCiberneticas = await _lojaNoturnaService.ObterTodasArmasCiberneticas(new CancellationToken());
-                return Ok(armasCiberneticas);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpGet("ciberneticas")]
-        public async Task<ActionResult<List<CiberneticasModel>>> ObterTodasCiberneticas()
-        {
-            try
-            {
-                var ciberneticas = await _lojaNoturnaService.ObterTodasCiberneticas(new CancellationToken());
-                return Ok(ciberneticas);
+                var lojaComun = await _lojaNoturnaService.ObterLojaComun(new CancellationToken());
+                return Ok(lojaComun);
             }
             catch (Exception ex)
             {
@@ -103,6 +46,34 @@ namespace itl_gerenciador_usuarios_api.Controllers
             {
                 var lojaNoturna = await _lojaNoturnaService.ObterLojaNoturna(new CancellationToken());
                 return Ok(lojaNoturna);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("comprarItemComum")]
+        public async Task<ActionResult> ComprarItemComum([FromBody] ComprarItemDto comprarItemDto)
+        {
+            try
+            {
+                await _lojaNoturnaService.ComprarItemComum(comprarItemDto.Categoria, comprarItemDto.IdMongo, comprarItemDto.Valor, comprarItemDto.IdPersonagem, new CancellationToken());
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("comprarLojaNoturna")]
+        public async Task<ActionResult> ComprarLojaNoturna([FromBody] ComprarItemDto comprarItemDto)
+        {
+            try
+            {
+                await _lojaNoturnaService.ComprarLojaNoturna(comprarItemDto.Categoria, comprarItemDto.IdMongo, comprarItemDto.Valor, comprarItemDto.IdPersonagem, new CancellationToken());
+                return Ok();
             }
             catch (Exception ex)
             {

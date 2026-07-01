@@ -28,9 +28,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("MinhaPoliticaCors", policy =>
     {
         policy
-            .WithOrigins("http://localhost:5173")
+            .WithOrigins("http://localhost:5173", "http://localhost:5132", "null")
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 builder.Services.AddControllers();
@@ -44,6 +45,7 @@ builder.Services.AddApplictionModule();
 var mongoConn = builder.Configuration.GetConnectionString("MongoDB");
 builder.Services.AddSingleton<MongoDB.Driver.IMongoClient>(sp => new MongoDB.Driver.MongoClient(mongoConn));
 builder.Services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
+builder.Services.AddScoped<IMongoMessageRepository, MongoMessageRepository>();
 
 // Discord integration
 builder.Services.Configure<DiscordSettings>(builder.Configuration.GetSection("Integrations:Discord"));
@@ -76,6 +78,8 @@ builder.Services
         };
     });
 builder.Services.AddSingleton<JwtTokenService>();
+builder.Services.AddSignalR();
+builder.Services.AddScoped<SignalRService>();
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -94,4 +98,5 @@ app.UseCors("MinhaPoliticaCors");
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<ChatHub>("/chathub");
 app.Run();

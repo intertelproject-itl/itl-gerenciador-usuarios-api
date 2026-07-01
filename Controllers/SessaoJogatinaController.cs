@@ -61,5 +61,24 @@ namespace itl_gerenciador_usuarios_api.Controllers
             var atributos = await _sessaoJogatinaService.BuscarPersonagemAtributosPorSessaoEUsuario(idPersonagem);
             return Ok(atributos);
         }
+
+        [HttpPost("{idSessao}/chat/{NomePersonagem}")]
+        public async Task<ActionResult> EnviarMensageChat(long idSessao, string nomePersonagem, string mensagem)
+        {
+            await _sessaoJogatinaService.NovaMensagem(new MensagemChatModel
+            {
+                DataCriacao = DateTime.Now,
+                IdSessao = (int)idSessao,
+                Mensagem = mensagem,
+                NomePersonagem = nomePersonagem
+            });
+            return Ok();
+        }
+
+        [HttpGet("{idSessao}/chat")]
+        public async Task<ActionResult<List<MensagemChatModel>>> CarregarChat(int idSessao)
+        {
+            return await _sessaoJogatinaService.CarregarChat(idSessao);
+        }
     }
 }

@@ -2,7 +2,9 @@
 using itl_gerenciador_usuarios_api.Domain.Interface.Repositories.v1;
 using itl_gerenciador_usuarios_api.Domain.Interface.Services.v1;
 using itl_gerenciador_usuarios_api.Domain.Models;
-using Org.BouncyCastle.Asn1.Cms;
+using itl_gerenciador_usuarios_api.Infraestructure.Integration;
+using itl_gerenciador_usuarios_api.Infraestructure.NoSql;
+using Microsoft.AspNetCore.SignalR;
 
 namespace itl_gerenciador_usuarios_api.Services.v1
 {
@@ -10,16 +12,22 @@ namespace itl_gerenciador_usuarios_api.Services.v1
     {
         private readonly ILogger<SessaoJogatinaService> _logger;
         private readonly ISessaoJogatinaRepository _sessaoJogatinaRepository;
-        private readonly IPersonagemPericiaRepository _personagemPericiaRepository; 
+        private readonly IPersonagemPericiaRepository _personagemPericiaRepository;
+        private readonly IMongoMessageRepository _repositoryChat;
         private readonly Dictionary<string, List<string>> _periciasPorAtributo;
+        private readonly SignalRService _signalR;
 
         public SessaoJogatinaService(ILogger<SessaoJogatinaService> logger,
             IPersonagemPericiaRepository personagemPericiaRepository,
             ISessaoJogatinaRepository sessaoJogatinaRepository,
+            IMongoMessageRepository repositorioChat,
+            SignalRService signalR,
             IConfiguration configuration)
         {
             _logger = logger;
             _personagemPericiaRepository = personagemPericiaRepository;
+            _repositoryChat = repositorioChat;
+            _signalR = signalR;
             _sessaoJogatinaRepository = sessaoJogatinaRepository;
             _periciasPorAtributo = configuration.GetSection("SpecialValidation:Pericias").Get<Dictionary<string, List<string>>>() ?? throw new Exception("Configuração de validação especial para 'Pericias' não encontrada.");
         }
@@ -99,6 +107,17 @@ namespace itl_gerenciador_usuarios_api.Services.v1
         public async Task<PersonagemAtributosModel> BuscarPersonagemAtributosPorSessaoEUsuario(long idPersonagem)
         {
             return await _sessaoJogatinaRepository.GetPersonagemAtributosByPersonagemIdAsync(idPersonagem, new CancellationToken());
+        }
+
+        public async Task<List<MensagemChatModel>> CarregarChat(int idSessao)
+        {
+            return await _repositoryChat.BuscarEntreHorariosAsync(idSessao, DateTime.Now.AddMinutes(-30), DateTime.Now, new CancellationToken());
+        }
+
+        public async Task NovaMensagem(MensagemChatModel mensagem)
+        {
+            await _signalR.EnviarMensagemChat(mensagem.IdSessao, mensagem.DataCriacao.ToString("yyyy-MM-dd HH:mm:ss"), mensagem.NomePersonagem, mensagem.Mensagem);
+            await _repositoryChat.InsertAsync(mensagem, new CancellationToken());
         }
     }
 }

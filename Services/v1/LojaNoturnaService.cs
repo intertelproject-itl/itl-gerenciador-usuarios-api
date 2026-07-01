@@ -54,6 +54,17 @@ namespace itl_gerenciador_usuarios_api.Services.v1
             }
         }
 
+        public async Task<LojaNoturnaModel> ObterLojaComun(CancellationToken ct)
+        {
+            var lojaComum = new LojaNoturnaModel();
+
+            lojaComum.Armas?.AddRange([.. await _armasRepository.GetListByChaveAsync("Raridade", "Comum", ct)]);
+            lojaComum.Armaduras?.AddRange([.. await _armadurasRepository.GetListByChaveAsync("Raridade", "Comum", ct)]);
+            lojaComum.ArmasCiberneticas?.AddRange([.. await _armasCiberneticasRepository.GetListByChaveAsync("Raridade", "Comum", ct)]);
+            lojaComum.Ciberneticas?.AddRange([.. await _ciberneticasRepository.GetListByChaveAsync("Raridade", "Comum", ct)]);
+            return lojaComum;
+        }
+
         public async Task<LojaNoturnaModel> ObterLojaNoturna(CancellationToken ct)
         {
             var lojaCache = await _lojaNoturnaRepository.GetFirstOrDefaultAsync(ct);
@@ -62,67 +73,143 @@ namespace itl_gerenciador_usuarios_api.Services.v1
             throw new Exception("Nenhuma loja noturna disponível no momento.");
         }
 
-        public async Task ComprarLojaNoturna(string id, decimal valor, int idPersonagem, CancellationToken ct)
+        public async Task ComprarItemComum(string categoria, string idMongo, long valor, int idPersonagem, CancellationToken ct)
         {
-            var inventario = await _inventarioRepository.GetByPersoangemIdAsync("IdPersonagem", idPersonagem.ToString(), ct);
+            var inventario = await _inventarioRepository.GetByChaveAsync("IdPersonagem", idPersonagem.ToString(), ct);
             if (inventario == null)
             {
                 await _inventarioRepository.InsertAsync(new InventarioModel
                 {
                     IdPersonagem = idPersonagem,
-                    Armas = new List<ArmasModel>(),
-                    Armaduras = new List<ArmaduraModel>(),
-                    ArmasCiberneticas = new List<ArmasCiberneticasModel>(),
-                    Ciberneticas = new List<CiberneticasModel>()
+                    Armas = [],
+                    Armaduras = [],
+                    ArmasCiberneticas = [],
+                    Ciberneticas = [],
+                    Outros = []
                 }, ct);
 
-                inventario = await _inventarioRepository.GetByPersoangemIdAsync("IdPersonagem", idPersonagem.ToString(), ct);
+                inventario = await _inventarioRepository.GetByChaveAsync("IdPersonagem", idPersonagem.ToString(), ct);
+            }
+
+            switch (categoria)
+            {
+                case "Armas":
+                    var arma = await _armasRepository.GetByIdAsync(idMongo, ct);
+                    if (arma != null)
+                    {
+                        await _personagemRepository.ComprarItem(idPersonagem, valor, ct);
+                        inventario.Armas?.Add(arma);
+                        await _inventarioRepository.UpdateAsync(inventario.Id, inventario, ct);
+                        return;
+                    }
+                    break;
+                case "Armaduras":
+                    var armadura = await _armadurasRepository.GetByIdAsync(idMongo, ct);
+                    if (armadura != null)
+                    {
+                        await _personagemRepository.ComprarItem(idPersonagem, valor, ct);
+                        inventario.Armaduras?.Add(armadura);
+                        await _inventarioRepository.UpdateAsync(inventario.Id, inventario, ct);
+                        return;
+                    }
+                    break;
+                case "ArmasCiberneticas":
+                    var armaCibernetica = await _armasCiberneticasRepository.GetByIdAsync(idMongo, ct);
+                    if (armaCibernetica != null)
+                    {
+                        await _personagemRepository.ComprarItem(idPersonagem, valor, ct);
+                        inventario.ArmasCiberneticas?.Add(armaCibernetica);
+                        await _inventarioRepository.UpdateAsync(inventario.Id, inventario, ct);
+                        return;
+                    }
+                    break;
+                case "Ciberneticas":
+                    var cibernetica = await _ciberneticasRepository.GetByIdAsync(idMongo, ct);
+                    if (cibernetica != null)
+                    {
+                        await _personagemRepository.ComprarItem(idPersonagem, valor, ct);
+                        inventario.Ciberneticas?.Add(cibernetica);
+                        await _inventarioRepository.UpdateAsync(inventario.Id, inventario, ct);
+                        return;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+        public async Task ComprarLojaNoturna(string categoria, string idMongo, long valor, int idPersonagem, CancellationToken ct)
+        {
+            var inventario = await _inventarioRepository.GetByChaveAsync("IdPersonagem", idPersonagem.ToString(), ct);
+            if (inventario == null)
+            {
+                await _inventarioRepository.InsertAsync(new InventarioModel
+                {
+                    IdPersonagem = idPersonagem,
+                    Armas = [],
+                    Armaduras = [],
+                    ArmasCiberneticas = [],
+                    Ciberneticas = [],
+                    Outros = []
+                }, ct);
+
+                inventario = await _inventarioRepository.GetByChaveAsync("IdPersonagem", idPersonagem.ToString(), ct);
             }
 
             var lojaNoturna = await ObterLojaNoturna(ct);
-
-            var arma = lojaNoturna.Armas?.FirstOrDefault(r => r.Id == id);
-            if (arma != null)
+            switch (categoria)
             {
-                await _personagemRepository.ComprarItem(idPersonagem, valor, ct);
-                lojaNoturna.Armas?.Remove(arma);                
-                await _lojaNoturnaRepository.UpdateAsync(lojaNoturna.Id, lojaNoturna, ct);
-                inventario.Armas?.Add(arma);
-                await _inventarioRepository.UpdateAsync(inventario.Id, inventario, ct);
-                return;
-            }
-
-            var armadura = lojaNoturna.Armaduras?.FirstOrDefault(r => r.Id == id);
-            if (armadura != null)
-            {
-                await _personagemRepository.ComprarItem(idPersonagem, valor, ct);
-                lojaNoturna.Armaduras?.Remove(armadura);                
-                await _lojaNoturnaRepository.UpdateAsync(lojaNoturna.Id, lojaNoturna, ct);
-                inventario.Armaduras?.Add(armadura);
-                await _inventarioRepository.UpdateAsync(inventario.Id, inventario, ct);
-                return;
-            }
-
-            var armaCibernetica = lojaNoturna.ArmasCiberneticas?.FirstOrDefault(r => r.Id == id);
-            if (armaCibernetica != null)
-            {
-                await _personagemRepository.ComprarItem(idPersonagem, valor, ct);
-                lojaNoturna.ArmasCiberneticas?.Remove(armaCibernetica);                
-                await _lojaNoturnaRepository.UpdateAsync(lojaNoturna.Id, lojaNoturna, ct);
-                inventario.ArmasCiberneticas?.Add(armaCibernetica);
-                await _inventarioRepository.UpdateAsync(inventario.Id, inventario, ct);
-                return;
-            }
-
-            var cibernetica = lojaNoturna.Ciberneticas?.FirstOrDefault(r => r.Id == id);
-            if (cibernetica != null)
-            {
-                await _personagemRepository.ComprarItem(idPersonagem, valor, ct);
-                lojaNoturna.Ciberneticas?.Remove(cibernetica);                
-                await _lojaNoturnaRepository.UpdateAsync(lojaNoturna.Id, lojaNoturna, ct);
-                inventario.Ciberneticas?.Add(cibernetica);
-                await _inventarioRepository.UpdateAsync(inventario.Id, inventario, ct);
-                return;
+                case "Armas":
+                    var arma = lojaNoturna.Armas?.FirstOrDefault(r => r.Id == idMongo);
+                    if (arma != null)
+                    {
+                        await _personagemRepository.ComprarItem(idPersonagem, valor, ct);
+                        lojaNoturna.Armas?.Remove(arma);
+                        await _lojaNoturnaRepository.UpdateAsync(lojaNoturna.Id, lojaNoturna, ct);
+                        inventario.Armas?.Add(arma);
+                        await _inventarioRepository.UpdateAsync(inventario.Id, inventario, ct);
+                        return;
+                    }
+                    break;
+                case "Armaduras":
+                    var armadura = lojaNoturna.Armaduras?.FirstOrDefault(r => r.Id == idMongo);
+                    if (armadura != null)
+                    {
+                        await _personagemRepository.ComprarItem(idPersonagem, valor, ct);
+                        lojaNoturna.Armaduras?.Remove(armadura);
+                        await _lojaNoturnaRepository.UpdateAsync(lojaNoturna.Id, lojaNoturna, ct);
+                        inventario.Armaduras?.Add(armadura);
+                        await _inventarioRepository.UpdateAsync(inventario.Id, inventario, ct);
+                        return;
+                    }
+                    break;
+                case "ArmasCiberneticas":
+                    var armaCibernetica = lojaNoturna.ArmasCiberneticas?.FirstOrDefault(r => r.Id == idMongo);
+                    if (armaCibernetica != null)
+                    {
+                        await _personagemRepository.ComprarItem(idPersonagem, valor, ct);
+                        lojaNoturna.ArmasCiberneticas?.Remove(armaCibernetica);
+                        await _lojaNoturnaRepository.UpdateAsync(lojaNoturna.Id, lojaNoturna, ct);
+                        inventario.ArmasCiberneticas?.Add(armaCibernetica);
+                        await _inventarioRepository.UpdateAsync(inventario.Id, inventario, ct);
+                        return;
+                    }
+                    break;
+                case "Ciberneticas":
+                    var cibernetica = lojaNoturna.Ciberneticas?.FirstOrDefault(r => r.Id == idMongo);
+                    if (cibernetica != null)
+                    {
+                        await _personagemRepository.ComprarItem(idPersonagem, valor, ct);
+                        lojaNoturna.Ciberneticas?.Remove(cibernetica);
+                        await _lojaNoturnaRepository.UpdateAsync(lojaNoturna.Id, lojaNoturna, ct);
+                        inventario.Ciberneticas?.Add(cibernetica);
+                        await _inventarioRepository.UpdateAsync(inventario.Id, inventario, ct);
+                        return;
+                    }
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -204,7 +291,7 @@ namespace itl_gerenciador_usuarios_api.Services.v1
         private T SortearItemPorPeso<T>(List<T> model)
         {
             if (typeof(T) == typeof(ArmasModel))
-            { 
+            {
                 var armaModel = model.Cast<ArmasModel>().ToList();
                 var pesoTotal = armaModel.Sum(item => _pesosPorRaridade[item.Raridade]);
 
