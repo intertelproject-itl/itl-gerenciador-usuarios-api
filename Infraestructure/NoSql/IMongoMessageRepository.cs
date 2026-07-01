@@ -6,5 +6,6 @@ namespace itl_gerenciador_usuarios_api.Infraestructure.NoSql
     {
         Task<List<MensagemChatModel>> BuscarEntreHorariosAsync(int idSessao, DateTime horarioInicio, DateTime horarioFim, CancellationToken ct);
         Task InsertAsync(MensagemChatModel item, CancellationToken ct);
+        Task Insert(MensagemChatModel item);
     }
 }

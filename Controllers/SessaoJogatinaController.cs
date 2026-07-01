@@ -84,6 +84,28 @@ namespace itl_gerenciador_usuarios_api.Controllers
             
         }
 
+        [HttpPost("{idSessao}/chat-async/{NomePersonagem}")]
+        public async Task<ActionResult> EnviarMensageChatAsync(long idSessao, string nomePersonagem, string mensagem, CancellationToken cancellationToken)
+        {
+            try
+            {
+                await _sessaoJogatinaService.NovaMensagemAsync(new MensagemChatModel
+                {
+                    DataCriacao = DateTime.Now,
+                    IdSessao = (int)idSessao,
+                    Mensagem = mensagem,
+                    NomePersonagem = nomePersonagem
+                }, cancellationToken);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex);
+            }
+
+        }
+
         [HttpGet("{idSessao}/chat")]
         public async Task<ActionResult<List<MensagemChatModel>>> CarregarChat(int idSessao)
         {

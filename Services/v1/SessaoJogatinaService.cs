@@ -114,10 +114,16 @@ namespace itl_gerenciador_usuarios_api.Services.v1
             return await _repositoryChat.BuscarEntreHorariosAsync(idSessao, DateTime.Now.AddMinutes(-30), DateTime.Now, new CancellationToken());
         }
 
+        public async Task NovaMensagemAsync(MensagemChatModel mensagem, CancellationToken cancellationToken)
+        {
+            await _signalR.EnviarMensagemChat(mensagem.IdSessao, mensagem.DataCriacao.ToString("yyyy-MM-dd HH:mm:ss"), mensagem.NomePersonagem, mensagem.Mensagem);
+            await _repositoryChat.InsertAsync(mensagem, cancellationToken);
+        }
+
         public async Task NovaMensagem(MensagemChatModel mensagem)
         {
             await _signalR.EnviarMensagemChat(mensagem.IdSessao, mensagem.DataCriacao.ToString("yyyy-MM-dd HH:mm:ss"), mensagem.NomePersonagem, mensagem.Mensagem);
-            await _repositoryChat.InsertAsync(mensagem, new CancellationToken());
+            await _repositoryChat.Insert(mensagem);
         }
     }
 }
