@@ -93,5 +93,21 @@ namespace itl_gerenciador_usuarios_api.Infraestructure.Repositories.v1
             var atributos = await conn.QuerySingleOrDefaultAsync<PersonagemAtributosModel>(new CommandDefinition(sql, new { IdPersonagem = idPersonagem }, cancellationToken: ct));
             return atributos ?? throw new Exception("Nenhum atributo encontrado para o personagem");
         }
+
+        public async Task AtualizarSituacaoLojaNoturna(long idSessao, int situacao)
+        {
+            const string sql = @"update sessao_jogatina set loja_noturna = @Situacao WHERE id_sessao = @IdSessao";
+            var conn = _db.Database.GetDbConnection();
+            if (conn.State == System.Data.ConnectionState.Closed) await conn.OpenAsync();
+            await conn.ExecuteAsync(sql, new { IdSessao = idSessao, Situacao = situacao });
+        }
+
+        public async Task AtualizarSituacaoLojaComum(long idSessao, int situacao)
+        {
+            const string sql = @"update sessao_jogatina set loja_comun = @Situacao WHERE id_sessao = @IdSessao";
+            var conn = _db.Database.GetDbConnection();
+            if (conn.State == System.Data.ConnectionState.Closed) await conn.OpenAsync();
+            await conn.ExecuteAsync(sql, new { IdSessao = idSessao, Situacao = situacao });
+        }
     }
 }

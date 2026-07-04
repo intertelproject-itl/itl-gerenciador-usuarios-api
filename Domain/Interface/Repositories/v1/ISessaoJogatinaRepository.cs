@@ -12,5 +12,7 @@ namespace itl_gerenciador_usuarios_api.Domain.Interface.Repositories.v1
         Task<PersonagemModel> GetPersonagemBySessaoAndUsuarioAsync(long idSessao, long idUsuario, CancellationToken ct);
         Task<PersonagemPericiasModel> GetPersonagemPericiasBySessaoAndUsuarioAsync(long idPersonagem, CancellationToken ct);
         Task<PersonagemAtributosModel> GetPersonagemAtributosByPersonagemIdAsync(long idPersonagem, CancellationToken ct);
+        Task AtualizarSituacaoLojaNoturna(long idSessao, int situacao);
+        Task AtualizarSituacaoLojaComum(long idSessao, int situacao);
     }
 }

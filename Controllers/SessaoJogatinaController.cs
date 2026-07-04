@@ -81,7 +81,7 @@ namespace itl_gerenciador_usuarios_api.Controllers
 
                 return BadRequest(ex);
             }
-            
+
         }
 
         [HttpPost("{idSessao}/chat-async/{NomePersonagem}")]
@@ -110,6 +110,20 @@ namespace itl_gerenciador_usuarios_api.Controllers
         public async Task<ActionResult<List<MensagemChatModel>>> CarregarChat(int idSessao)
         {
             return await _sessaoJogatinaService.CarregarChat(idSessao);
+        }
+
+        [HttpPost("{idSessao}/atualizarLojaNoturna")]
+        public async Task<ActionResult> AtualizarLojaNoturna(int idSessao, int situacao)
+        {
+            await _sessaoJogatinaService.AtualizaSituacaoLojaNoturna(idSessao, situacao);
+            return Ok();
+        }
+
+        [HttpPost("{idSessao}/atualizarLojaComum")]
+        public async Task<ActionResult> AtualizarLojaComum(int idSessao, int situacao)
+        {
+            await _sessaoJogatinaService.AtualizaSituacaoLojaComum(idSessao, situacao);
+            return Ok();
         }
     }
 }

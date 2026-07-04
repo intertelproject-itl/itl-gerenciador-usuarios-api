@@ -14,6 +14,8 @@ namespace itl_gerenciador_usuarios_api.Domain.Interface.Services.v1
         Task<List<MensagemChatModel>> CarregarChat(int idSessao);
         Task NovaMensagemAsync(MensagemChatModel mensagem, CancellationToken cancellationToken);
         Task NovaMensagem(MensagemChatModel mensagem);
-        Task AcessarAsync(long idSessao, long idPersonagem);        
+        Task AcessarAsync(long idSessao, long idPersonagem);
+        Task AtualizaSituacaoLojaNoturna(int idSessao, int situacao);
+        Task AtualizaSituacaoLojaComum(int idSessao, int situacao);
     }
 }

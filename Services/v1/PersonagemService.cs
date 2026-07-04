@@ -2,11 +2,12 @@
 using itl_gerenciador_usuarios_api.Domain.Interface.Repositories.v1;
 using itl_gerenciador_usuarios_api.Domain.Interface.Services.v1;
 using itl_gerenciador_usuarios_api.Domain.Models;
+using itl_gerenciador_usuarios_api.Infraestructure.Integration;
 
 namespace itl_gerenciador_usuarios_api.Services.v1
 {
     public class PersonagemService(IPersonagemRepository personagemRepository, IWebHostEnvironment env,
-        IPersonagemAtributoRepository personagemAtributoRepository, IPersonagemPericiaRepository personagemPericiaRepository) : IPersonagemService
+        IPersonagemAtributoRepository personagemAtributoRepository, IPersonagemPericiaRepository personagemPericiaRepository, SignalRService signalRService) : ServiceBase(signalRService), IPersonagemService
     {
         private readonly IWebHostEnvironment _env = env;
         private readonly IPersonagemRepository _personagemRepository = personagemRepository;
@@ -25,6 +26,8 @@ namespace itl_gerenciador_usuarios_api.Services.v1
             await _personagemPericiaRepository.UpdatePericiasSociaisAsync(personagemPericia.PericiasSociais, new CancellationToken());
             await _personagemPericiaRepository.UpdatePericiasTecnicasAsync(personagemPericia.PericiasTecnicas, new CancellationToken());
             await _personagemPericiaRepository.UpdatePericiasArmasAsync(personagemPericia.PericiasArmas, new CancellationToken());
+
+            await _signalRService.AtualizarPericia((int)personagemPericia.PericiasLuta.IdPersonagem, (int)personagemPericia.PericiasLuta.IdSessao);
         }
 
         public async Task RegistrarPersonagem(PersonagemRequestDTO personagem, CancellationToken ct)
@@ -47,45 +50,23 @@ namespace itl_gerenciador_usuarios_api.Services.v1
             };
 
             // cria pericias zeradas
-            var pericias = new PersonagemPericiasModel
-            {
-                IdPersonagem = idPersonagem,
-                Atletismo = 0,
-                Briga = 0,
-                Concentracao = 0,
-                Conversa = 0,
-                Educacao = 0,
-                Evasao = 0,
-                Intimidacao = 0,
-                Percepcao = 0,
-                Persuasao = 0,
-                Pilotagem = 0,
-                PrimeirosSocorros = 0,
-                Furtividade = 0,
-                Sobrevivencia = 0,
-                Negociacao = 0,
-                Criminologia = 0,
-                Deducao = 0,
-                ResistirDrogasTortura = 0,
-                TecnologiaBasica = 0,
-                SegurancaEletronica = 0,
-                Hackear = 0,
-                MecanicaTerrestre = 0,
-                Medicina = 0,
-                Ciencia = 0,
-                ArmasDeFogo = 0,
-                ArmasPesadas = 0,
-                LutaCorpoACorpo = 0,
-                Editavel = 1
-            };
+            await _personagemPericiaRepository.InsertPericiasArmasAsync(new PericiasArmasModel { IdPersonagem = idPersonagem, IdSessao = personagem.SessionId, Editavel = true }, ct);
+            await _personagemPericiaRepository.InsertPericiasAtencaoAsync(new PericiasAtencaoModel { IdPersonagem = idPersonagem, IdSessao = personagem.SessionId, Editavel = true }, ct);
+            await _personagemPericiaRepository.InsertPericiasConducaoAsync(new PericiasConducaoModel { IdPersonagem = idPersonagem, IdSessao = personagem.SessionId, Editavel = true }, ct);
+            await _personagemPericiaRepository.InsertPericiasCorporaisAsync(new PericiasCorporaisModel { IdPersonagem = idPersonagem, IdSessao = personagem.SessionId, Editavel = true }, ct);
+            await _personagemPericiaRepository.InsertPericiasEducacaoAsync(new PericiasEducacaoModel { IdPersonagem = idPersonagem, IdSessao = personagem.SessionId, Editavel = true }, ct);
+            await _personagemPericiaRepository.InsertPericiasPerformanceAsync(new PericiasPerformanceModel { IdPersonagem = idPersonagem, IdSessao = personagem.SessionId, Editavel = true }, ct);
+            await _personagemPericiaRepository.InsertPericiasSociaisAsync(new PericiasSociaisModel { IdPersonagem = idPersonagem, IdSessao = personagem.SessionId, Editavel = true }, ct);
+            await _personagemPericiaRepository.InsertPericiasTecnicasAsync(new PericiasTecnicasModel { IdPersonagem = idPersonagem, IdSessao = personagem.SessionId, Editavel = true }, ct);
+            await _personagemPericiaRepository.InsertPericiasLutaAsync(new PericiasLutaModel { IdPersonagem = idPersonagem, IdSessao = personagem.SessionId, Editavel = true }, ct);            
 
-            await _personagemAtributoRepository.AddAsync(atributos, ct);
-            //await _personagemPericiaRepository.AddAsync(pericias, ct);
+            await _personagemAtributoRepository.AddAsync(atributos, ct);            
         }
 
         public async Task AtualizarBriefing(int idPersonagem, string briefing, CancellationToken ct)
         {
             await _personagemRepository.AtualizarBriefingAsync(idPersonagem, briefing, ct);
+            await _signalRService.AtualizarFicha(1, idPersonagem);
         }
 
         public async Task AtualizarRetrato(long idPersonagem, long idSessao, IFormFile portrait)
@@ -100,7 +81,7 @@ namespace itl_gerenciador_usuarios_api.Services.v1
             if (!extensoesPermitidas.Contains(extensao))
                 throw new Exception("Formato de imagem não permitido.");
 
-            var path = _env.WebRootPath;
+            var path = Path.Combine(_env.WebRootPath, "uploads");
 
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
@@ -121,11 +102,7 @@ namespace itl_gerenciador_usuarios_api.Services.v1
         public async Task UpdateAtributos(PersonagemAtributosModel atributos, CancellationToken ct)
         {
             await _personagemAtributoRepository.UpdateAsync(atributos, ct);
-        }
-
-        public async Task UpdatePericias(PersonagemPericiasModel pericias, CancellationToken ct)
-        {
-            //await _personagemPericiaRepository.UpdateAsync(pericias, ct);
+            await _signalRService.AtualizarFicha(1, (int)atributos.IdPersonagem);
         }
     }
 }

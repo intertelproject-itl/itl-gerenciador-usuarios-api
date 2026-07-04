@@ -2,13 +2,14 @@
 using itl_gerenciador_usuarios_api.Domain.Interface.Repositories.v1;
 using itl_gerenciador_usuarios_api.Domain.Interface.Services.v1;
 using itl_gerenciador_usuarios_api.Domain.Models;
+using itl_gerenciador_usuarios_api.Infraestructure.Integration;
 using itl_gerenciador_usuarios_api.Infraestructure.NoSql;
 
 namespace itl_gerenciador_usuarios_api.Services.v1
 {
     public class LojaNoturnaService(IMongoRepository<ArmasModel> armasRepository, IPersonagemRepository personagemRepository, IMongoRepository<InventarioModel> inventarioRepository,
         IMongoRepository<ArmaduraModel> armadurasRepository, IMongoRepository<ArmasCiberneticasModel> armasCiberneticasRepository,
-        IMongoRepository<CiberneticasModel> ciberneticasRepository, IMongoRepository<LojaNoturnaModel> lojaNoturnaRepository) : ILojaNoturnaService
+        IMongoRepository<CiberneticasModel> ciberneticasRepository, IMongoRepository<LojaNoturnaModel> lojaNoturnaRepository, SignalRService signalRService) : ServiceBase(signalRService), ILojaNoturnaService
     {
         private readonly IMongoRepository<InventarioModel> _inventarioRepository = inventarioRepository;
         private readonly IPersonagemRepository _personagemRepository = personagemRepository;
@@ -144,7 +145,7 @@ namespace itl_gerenciador_usuarios_api.Services.v1
             var inventario = await _inventarioRepository.GetByChaveAsync("IdPersonagem", idPersonagem.ToString(), ct);
             if (inventario == null)
             {
-                await _inventarioRepository.InsertAsync(new InventarioModel
+                inventario = new InventarioModel
                 {
                     IdPersonagem = idPersonagem,
                     Armas = [],
@@ -152,9 +153,8 @@ namespace itl_gerenciador_usuarios_api.Services.v1
                     ArmasCiberneticas = [],
                     Ciberneticas = [],
                     Outros = []
-                }, ct);
-
-                inventario = await _inventarioRepository.GetByChaveAsync("IdPersonagem", idPersonagem.ToString(), ct);
+                };
+                await _inventarioRepository.InsertAsync(inventario, ct);                
             }
 
             var lojaNoturna = await ObterLojaNoturna(ct);

@@ -4,30 +4,27 @@ using itl_gerenciador_usuarios_api.Domain.Interface.Services.v1;
 using itl_gerenciador_usuarios_api.Domain.Models;
 using itl_gerenciador_usuarios_api.Infraestructure.Integration;
 using itl_gerenciador_usuarios_api.Infraestructure.NoSql;
-using Microsoft.AspNetCore.SignalR;
 
 namespace itl_gerenciador_usuarios_api.Services.v1
 {
-    public class SessaoJogatinaService : ISessaoJogatinaService
+    public class SessaoJogatinaService : ServiceBase, ISessaoJogatinaService
     {
         private readonly ILogger<SessaoJogatinaService> _logger;
         private readonly ISessaoJogatinaRepository _sessaoJogatinaRepository;
         private readonly IPersonagemPericiaRepository _personagemPericiaRepository;
         private readonly IMongoMessageRepository _repositoryChat;
         private readonly Dictionary<string, List<string>> _periciasPorAtributo;
-        private readonly SignalRService _signalR;
 
         public SessaoJogatinaService(ILogger<SessaoJogatinaService> logger,
             IPersonagemPericiaRepository personagemPericiaRepository,
             ISessaoJogatinaRepository sessaoJogatinaRepository,
             IMongoMessageRepository repositorioChat,
             SignalRService signalR,
-            IConfiguration configuration)
+            IConfiguration configuration) : base(signalR)
         {
             _logger = logger;
             _personagemPericiaRepository = personagemPericiaRepository;
             _repositoryChat = repositorioChat;
-            _signalR = signalR;
             _sessaoJogatinaRepository = sessaoJogatinaRepository;
             _periciasPorAtributo = configuration.GetSection("SpecialValidation:Pericias").Get<Dictionary<string, List<string>>>() ?? throw new Exception("Configuração de validação especial para 'Pericias' não encontrada.");
         }
@@ -102,7 +99,7 @@ namespace itl_gerenciador_usuarios_api.Services.v1
             personagemPericias.PericiasTecnicas.AplicarAtributosBase(_periciasPorAtributo, valoresAtributos);
 
             return personagemPericias;
-        }     
+        }
 
         public async Task<PersonagemAtributosModel> BuscarPersonagemAtributosPorSessaoEUsuario(long idPersonagem)
         {
@@ -116,14 +113,41 @@ namespace itl_gerenciador_usuarios_api.Services.v1
 
         public async Task NovaMensagemAsync(MensagemChatModel mensagem, CancellationToken cancellationToken)
         {
-            await _signalR.EnviarMensagemChat(mensagem.IdSessao, mensagem.DataCriacao.ToString("yyyy-MM-dd HH:mm:ss"), mensagem.NomePersonagem, mensagem.Mensagem);
+            await _signalRService.EnviarMensagemChat(mensagem.IdSessao, mensagem.DataCriacao.ToString("yyyy-MM-dd HH:mm:ss"), mensagem.NomePersonagem, mensagem.Mensagem);
             await _repositoryChat.InsertAsync(mensagem, cancellationToken);
         }
 
         public async Task NovaMensagem(MensagemChatModel mensagem)
         {
-            await _signalR.EnviarMensagemChat(mensagem.IdSessao, mensagem.DataCriacao.ToString("yyyy-MM-dd HH:mm:ss"), mensagem.NomePersonagem, mensagem.Mensagem);
-            await _repositoryChat.Insert(mensagem);
+            await _signalRService.EnviarMensagemChat(mensagem.IdSessao, mensagem.DataCriacao.ToString("yyyy-MM-dd HH:mm:ss"), mensagem.NomePersonagem, mensagem.Mensagem);
+            await _repositoryChat.InsertAsync(mensagem, new CancellationToken());
+        }
+
+        public async Task AtualizaSituacaoLojaNoturna(int idSessao, int situacao)
+        {
+            await _sessaoJogatinaRepository.AtualizarSituacaoLojaNoturna(idSessao, situacao);
+            if (situacao == 1)
+            {
+                await _signalRService.LigarLojaNoturna(idSessao);
+
+            }
+            else
+            {
+                await _signalRService.DesligarLojaNoturna(idSessao);
+            }
+        }
+
+        public async Task AtualizaSituacaoLojaComum(int idSessao, int situacao)
+        {
+            await _sessaoJogatinaRepository.AtualizarSituacaoLojaComum(idSessao, situacao);
+            if (situacao == 1)
+            {
+                await _signalRService.LigarLojaComun(idSessao);
+            }
+            else
+            {
+                await _signalRService.DesligarLojaComun(idSessao);
+            }
         }
     }
 }

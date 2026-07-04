@@ -32,6 +32,10 @@ namespace itl_gerenciador_usuarios_api.Domain.Models
 
     public class OutrosModel
     {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string? Id { get; set; }
+
         [BsonElement("nome")]
         public string Nome { get; set; } = string.Empty;
 
