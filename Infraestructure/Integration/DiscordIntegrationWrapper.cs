@@ -6,8 +6,8 @@ namespace itl_gerenciador_usuarios_api.Infraestructure.Integration
     // Thin wrapper that can be replaced or extended separately from the core integration
     public class DiscordIntegrationWrapper : DiscordIntegration
     {
-        public DiscordIntegrationWrapper(IOptions<DiscordSettings> options, HttpClient http)
-            : base(options, http)
+        public DiscordIntegrationWrapper(IOptions<DiscordSettings> options, HttpClient http, SignalRService signalRService)
+            : base(options, http, signalRService)
         {
         }
 
